@@ -1,0 +1,6 @@
+@SkillCentral.EmployeeServices_HostAddress = http://localhost:5228
+
+GET {{SkillCentral.EmployeeServices_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

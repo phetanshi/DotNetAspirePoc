@@ -1,0 +1,6 @@
+@SkillCentral.NotificationServices_HostAddress = http://localhost:5013
+
+GET {{SkillCentral.NotificationServices_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
