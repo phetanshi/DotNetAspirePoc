@@ -1,6 +1,8 @@
 using SkillCentral.EmployeeServices.Apis;
 using SkillCentral.EmployeeServices.Data;
+using SkillCentral.EmployeeServices.Services;
 using SkillCentral.Repository;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,10 @@ builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServerRepository<EmployeeDbContext>(builder.Configuration);
+
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

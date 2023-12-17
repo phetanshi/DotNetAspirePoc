@@ -1,5 +1,6 @@
 using SkillCentral.NotificationServices.Apis;
 using SkillCentral.NotificationServices.Data;
+using SkillCentral.NotificationServices.Services;
 using SkillCentral.Repository;
 
 namespace SkillCentral.NotificationServices;
@@ -18,6 +19,8 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSqlServerRepository<NotificationDbContext>(builder.Configuration);
+        builder.Services.AddScoped<INotificationService, InAppNotificationService>();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         var app = builder.Build();
 
