@@ -8,7 +8,10 @@ namespace SkillCentral.EmployeeServices.Utils
     {
         public EmployeeAutoMapperProfile()
         {
-            CreateMap<Employee, EmployeeDto>();
+            CreateMap<Employee, EmployeeDto>()
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ReverseMap();
+
             CreateMap<EmployeeCreateDto, Employee>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => DateTime.UtcNow))

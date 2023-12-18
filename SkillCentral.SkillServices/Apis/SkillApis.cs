@@ -13,7 +13,7 @@ namespace SkillCentral.SkillServices.Apis
                 var data = await skillService.GetAsync();
                 ApiResponse<List<SkillDto>> apiResponse = new ApiResponse<List<SkillDto>>();
 
-                apiResponse.IsSuccess = data is not null ? true : false;
+                apiResponse.IsSuccess = true;
                 apiResponse.Message = data is null ? "Something went wrong!" : "";
                 apiResponse.Payload = data;
                 return apiResponse;
@@ -26,8 +26,8 @@ namespace SkillCentral.SkillServices.Apis
                 var data = await skillService.GetAsync(skillId);
                 ApiResponse<SkillDto> apiResponse = new ApiResponse<SkillDto>();
 
-                apiResponse.IsSuccess = data is not null ? true : false;
-                apiResponse.Message = data is null ? "Something went wrong!" : "";
+                apiResponse.IsSuccess = true;
+                apiResponse.Message = data is null ? "Details did not found!" : "";
                 apiResponse.Payload = data;
                 return apiResponse;
             })

@@ -12,16 +12,9 @@ public static class EmployeeApi
         {
             var data = await employeeService.GetAsync();
             ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
-            if(data is not null)
-            {
-                apiResponse.Payload = data;
-                apiResponse.IsSuccess = true;
-            }
-            else
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Something went wrong!";
-            }
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = data is null ? "Something went wrong!" : "";
+            apiResponse.Payload = data;
 
             return apiResponse;
         })
@@ -32,20 +25,15 @@ public static class EmployeeApi
         {
             var data = await employeeService.GetAsync(userId);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
-            if (data is not null)
-            {
-                apiResponse.Payload = data;
-                apiResponse.IsSuccess = true;
-            }
-            else
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Something went wrong!";
-            }
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = data is null ? "Data did not found!" : "";
+            apiResponse.Payload = data;
+
             return apiResponse;
         })
         .WithName("GetEmployeeById")
         .WithOpenApi();
+
 
         app.MapPost("/employeesvc/create", async (IEmployeeService employeeService, [FromBody] EmployeeCreateDto employee) =>
         {
@@ -66,6 +54,7 @@ public static class EmployeeApi
         .WithName("CreateEmployee")
         .WithOpenApi();
 
+
         app.MapPut("/employeesvc/update", async (IEmployeeService employeeService, [FromBody] EmployeeDto employee) =>
         {
             var data = await employeeService.UpdateAsync(employee);
@@ -77,6 +66,7 @@ public static class EmployeeApi
         })
         .WithName("UpdateEmployee")
         .WithOpenApi();
+
 
         app.MapDelete("/employeesvc/delete", async (IEmployeeService employeeService, [FromBody] string userId) =>
         {

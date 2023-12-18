@@ -12,7 +12,7 @@ public static class EmployeeSkillApi
 
             ApiResponse<List<EmployeeSkillDto>> apiResponse = new ApiResponse<List<EmployeeSkillDto>>();
 
-            apiResponse.IsSuccess = data is not null ? true : false;
+            apiResponse.IsSuccess = true;
             apiResponse.Message = data is null ? "Something went wrong!" : "";
             apiResponse.Payload = data;
             return apiResponse;

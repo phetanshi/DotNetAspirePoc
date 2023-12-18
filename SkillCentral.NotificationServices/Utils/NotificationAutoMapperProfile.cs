@@ -8,7 +8,8 @@ namespace SkillCentral.NotificationServices.Utils
     {
         public NotificationAutoMapperProfile()
         {
-            CreateMap<Notification, NotificationDto>();
+            CreateMap<Notification, NotificationDto>()
+                .ReverseMap();
             CreateMap<NotificationCreateDto, Notification>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => DateTime.UtcNow))

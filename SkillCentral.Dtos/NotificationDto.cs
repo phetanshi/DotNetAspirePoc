@@ -9,5 +9,5 @@ public class NotificationDto
     public int Id { get; set; }
     public string Notification { get; set; }
     public bool IsCompleted { get; set; }
-    public EmployeeDto Employee { get; set; }
+    public EmployeeDto? Employee { get; set; }
 }

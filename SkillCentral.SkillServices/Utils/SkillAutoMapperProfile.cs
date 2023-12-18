@@ -8,7 +8,7 @@ namespace SkillCentral.SkillServices.Utils
     {
         public SkillAutoMapperProfile()
         {
-            CreateMap<Skill, SkillDto>();
+            CreateMap<Skill, SkillDto>().ReverseMap();
             CreateMap<EmployeeSkill, EmployeeSkillDto>();
 
             CreateMap<SkillCreateDto, Skill>()

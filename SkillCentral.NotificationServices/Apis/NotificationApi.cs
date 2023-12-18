@@ -13,9 +13,10 @@ public static class NotificationApi
             var data = await notificaitonService.GetAsync(userId);
             ApiResponse<List<NotificationDto>> apiResponse = new ApiResponse<List<NotificationDto>>();
 
-            apiResponse.IsSuccess = data is not null ? true : false;
-            apiResponse.Message = data is null ? "Something went wrong!" : "";
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = data is null ? "Data did not found!" : "";
             apiResponse.Payload = data;
+
             return apiResponse;
         })
         .WithName("GetNotification")
@@ -51,12 +52,12 @@ public static class NotificationApi
         {
             var data = await notificaitonService.DeleteAsync(notificationId);
             ApiResponse<bool> apiResponse = new ApiResponse<bool>();
-            apiResponse.IsSuccess = data ? true : false;
+            apiResponse.IsSuccess = data;
             apiResponse.Message = !data ? "Something went wrong!" : "";
             apiResponse.Payload = data;
             return apiResponse;
         })
-        .WithName("MarkAsCompleted")
+        .WithName("DeleteNotification")
         .WithOpenApi();
     }
 }
