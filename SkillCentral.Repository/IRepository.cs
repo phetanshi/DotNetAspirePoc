@@ -124,14 +124,6 @@ public interface IRepository
     Task<T> CreateAsync<T>(T entity) where T : class;
 
     /// <summary>
-    /// Inserts a new record into the specified table.(Async Method)
-    /// </summary>
-    /// <typeparam name="T">Any class type</typeparam>
-    /// <param name="entity">Object that need to be inserted in database</param>
-    /// <returns>object of given type</returns>
-    Task<TDest> CreateWithMapperAsync<TSource, TDest>(TSource source) where TDest : class;
-
-    /// <summary>
     /// Inserts list of new records into the specified table.
     /// </summary>
     /// <typeparam name="T">Any class type</typeparam>

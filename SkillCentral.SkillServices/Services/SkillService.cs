@@ -1,22 +1,27 @@
 ﻿using AutoMapper;
 using SkillCentral.Dtos;
 using SkillCentral.Repository;
-using SkillCentral.SkillServices.Data;
 using SkillCentral.SkillServices.Data.DbModels;
 
 namespace SkillCentral.SkillServices.Services
 {
-    public class SkillService(IRepository repository, IMapper mapper, ILogger<SkillService> logger) : ISkillService
+    public class SkillService(IRepository repository, IMapper mapper, ILogger<SkillService> logger, IHttpContextAccessor context) : ServiceBase(context), ISkillService
     {
         public async Task<SkillDto> CreateAsync(SkillCreateDto skill)
         {
             if(skill is null)
                 throw new ArgumentNullException("skill input object cannot be null");
 
-            var e = await repository.CreateWithMapperAsync<SkillCreateDto, Skill>(skill);
-            if (e is null)
+
+            var dbSkill = mapper.Map<Skill>(skill);
+            dbSkill.DateCreated = DateTime.Now;
+            dbSkill.CreatedUserId = GetLoginUserId();
+            dbSkill = await repository.CreateAsync(dbSkill);
+
+            if (skill is null)
                 return null;
-            return mapper.Map<SkillDto>(e);
+
+            return mapper.Map<SkillDto>(dbSkill);
         }
 
         public async Task<bool> DeleteAsync(int skillId)
@@ -24,7 +29,7 @@ namespace SkillCentral.SkillServices.Services
             var skill = await repository.GetSingleAsync<Skill>(skillId);
             skill.IsActive = false;
             skill.DateUpdated = DateTime.UtcNow;
-            skill.UpdatedUserId = "deleteuser";
+            skill.UpdatedUserId = GetLoginUserId();
             int count = await repository.UpdateAsync(skill);
             return count > 0;
         }
@@ -58,7 +63,7 @@ namespace SkillCentral.SkillServices.Services
                 return null;
 
             updatedData.DateUpdated = DateTime.UtcNow;
-            updatedData.UpdatedUserId = "updateduser";
+            updatedData.UpdatedUserId = GetLoginUserId();
 
             int count = await repository.UpdateAsync(updatedData);
             if (count > 0)

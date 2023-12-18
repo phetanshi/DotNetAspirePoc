@@ -12,7 +12,7 @@ public static class EmployeeApi
         {
             var data = await employeeService.GetAsync();
             ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
-            if(data is not null && data.Count > 0)
+            if(data is not null)
             {
                 apiResponse.Payload = data;
                 apiResponse.IsSuccess = true;
@@ -66,7 +66,7 @@ public static class EmployeeApi
         .WithName("CreateEmployee")
         .WithOpenApi();
 
-        app.MapDelete("/employeesvc/update", async (IEmployeeService employeeService, [FromBody] EmployeeDto employee) =>
+        app.MapPut("/employeesvc/update", async (IEmployeeService employeeService, [FromBody] EmployeeDto employee) =>
         {
             var data = await employeeService.UpdateAsync(employee);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();

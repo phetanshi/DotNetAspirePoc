@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkillCentral.NotificationServices.Apis;
 using SkillCentral.NotificationServices.Data;
 using SkillCentral.NotificationServices.Services;
@@ -20,6 +21,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSqlServerRepository<NotificationDbContext>(builder.Configuration);
         builder.Services.AddScoped<INotificationService, InAppNotificationService>();
+        builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         var app = builder.Build();

@@ -1,45 +1,56 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using SkillCentral.Dtos;
-using SkillCentral.NotificationServices.Data;
 using SkillCentral.NotificationServices.Data.DbModels;
+using SkillCentral.Repository;
 
 namespace SkillCentral.NotificationServices.Services
 {
-    public class InAppNotificationService(NotificationDbContext database, IMapper mapper, ILogger<InAppNotificationService> logger) : INotificationService
+    public class InAppNotificationService(IRepository repository, IMapper mapper, ILogger<InAppNotificationService> logger, IHttpContextAccessor context) : ServiceBase(context), INotificationService
     {
         public async Task<NotificationDto> CompletedAsync(int notificationId)
         {
-            var notification = await database.Notifications.FindAsync(notificationId);
+            var notification = await repository.GetSingleAsync<Notification>(notificationId);
             if (notification == null) return null;
             
             notification.IsCompleted = true;
-            await database.SaveChangesAsync();
+            notification.DateUpdated = DateTime.UtcNow;
+            notification.UpdatedUserId = GetLoginUserId();
+            await repository.UpdateAsync(notification);
+
             return mapper.Map<NotificationDto>(notification);
         }
 
         public async Task<NotificationDto> CreateAsync(NotificationCreateDto notificationDto)
         {
             var dbObj = mapper.Map<Notification>(notificationDto);
-            database.Notifications.Add(dbObj);
-            int count = await database.SaveChangesAsync();
-            if (count == 0) return null;
+            dbObj.CreatedUserId = GetLoginUserId();
+            dbObj.DateCreated = DateTime.UtcNow;
+
+            dbObj = await repository.CreateAsync(dbObj);
+
+            if (dbObj is null)
+                return null;
+
             return mapper.Map<NotificationDto>(dbObj);
         }
 
         public async Task<bool> DeleteAsync(int notificationId)
         {
-            var notification = await database.Notifications.FindAsync(notificationId);
+            var notification = await repository.GetSingleAsync<Notification>(notificationId);
             if (notification == null) return false;
 
             notification.IsActive = false;
-            var count = await database.SaveChangesAsync();
+            notification.UpdatedUserId = GetLoginUserId();
+            notification.DateUpdated = DateTime.UtcNow;
+
+            int count = await repository.UpdateAsync(notification);
+
             return count > 0;
         }
 
         public async Task<List<NotificationDto>> GetAsync(string userId)
         {
-            var dbData = await database.Notifications.Where(x => string.Equals(x.UserId, userId, StringComparison.OrdinalIgnoreCase)).ToListAsync();
+            var dbData = await repository.GetListAsync<Notification>(x => x.UserId.ToLower() == userId.ToLower());
             return mapper.Map<List<NotificationDto>>(dbData);
         }
     }

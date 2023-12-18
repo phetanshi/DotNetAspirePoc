@@ -1,16 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkillCentral.Repository;
 
-public class Repository(DbContext database, IMapper mapper, ILogger<Repository> logger) : IRepository
+public class Repository(DbContext database, ILogger<Repository> logger) : IRepository
 {
     #region GetList
     public IQueryable<T> GetList<T>() where T : class
@@ -102,13 +96,6 @@ public class Repository(DbContext database, IMapper mapper, ILogger<Repository> 
         return entityList;
     }
 
-    public async Task<TDest> CreateWithMapperAsync<TSource, TDest>(TSource source) where TDest : class
-    {
-        var entity = mapper.Map<TDest>(source);
-        await database.Set<TDest>().AddAsync(entity);
-        await database.SaveChangesAsync();
-        return entity;
-    }
     #endregion
 
     #region Update

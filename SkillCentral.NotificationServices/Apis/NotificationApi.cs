@@ -47,7 +47,7 @@ public static class NotificationApi
         .WithName("MarkAsCompleted")
         .WithOpenApi();
 
-        app.MapPut("/notificationsvc/delete", async (INotificationService notificaitonService, [FromBody] int notificationId) =>
+        app.MapDelete("/notificationsvc/delete", async (INotificationService notificaitonService, [FromBody] int notificationId) =>
         {
             var data = await notificaitonService.DeleteAsync(notificationId);
             ApiResponse<bool> apiResponse = new ApiResponse<bool>();

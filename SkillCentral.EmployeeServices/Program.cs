@@ -3,6 +3,7 @@ using SkillCentral.EmployeeServices.Data;
 using SkillCentral.EmployeeServices.Services;
 using SkillCentral.Repository;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddSqlServerRepository<EmployeeDbContext>(builder.Configuration
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
 
