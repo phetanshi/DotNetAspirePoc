@@ -9,34 +9,34 @@ namespace SkillCentral.EmployeeServices.Services
         /// </summary>
         /// <param name="userId">Employee login user id which is a string</param>
         /// <returns></returns>
-        Task<EmployeeDto> Get(string userId);
+        Task<EmployeeDto> GetAsync(string userId);
 
         /// <summary>
         /// Retrieves all active employees in the system
         /// </summary>
         /// <returns></returns>
-        Task<List<EmployeeDto>> Get();
+        Task<List<EmployeeDto>> GetAsync();
 
         /// <summary>
         /// Creates an employee 
         /// </summary>
         /// <param name="employee">employee object of EmployeeCreateDto type</param>
         /// <returns></returns>
-        Task<EmployeeDto> Create(EmployeeCreateDto employee);
+        Task<EmployeeDto> CreateAsync(EmployeeCreateDto employee);
 
         /// <summary>
         /// Updates employee details
         /// </summary>
         /// <param name="updatedEmployee"></param>
         /// <returns></returns>
-        Task<EmployeeDto> Update(EmployeeDto updatedEmployee);
+        Task<EmployeeDto> UpdateAsync(EmployeeDto updatedEmployee);
 
         /// <summary>
         /// Deletes an employee
         /// </summary>
         /// <param name="userId">Employee login user id which is a string</param>
         /// <returns></returns>
-        Task<bool> Delete(string userId);
+        Task<bool> DeleteAsync(string userId);
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,120 +10,205 @@ using System.Threading.Tasks;
 
 namespace SkillCentral.Repository;
 
-public class Repository : IRepository
+public class Repository(DbContext database, IMapper mapper, ILogger<Repository> logger) : IRepository
 {
-    private readonly ILogger<Repository> _logger;
-
-    public Repository(DbContext database, ILogger<Repository> logger)
+    #region GetList
+    public IQueryable<T> GetList<T>() where T : class
     {
-        Database = database;
-        this._logger = logger;
+        return database.Set<T>();
     }
 
-    public DbContext Database { get; }
-
-    #region GetAll
-    public IQueryable<T> GetAll<T>() where T : class
+    public IQueryable<T> GetList<T>(Expression<Func<T, bool>> predicate) where T : class
     {
-        return Database.Set<T>();
+        return database.Set<T>().Where(predicate);
     }
 
-    public IQueryable<T> GetAll<T>(Expression<Func<T, bool>> predicate) where T : class
+    public async Task<IQueryable<T>> GetListAsync<T>() where T : class
     {
-        return Database.Set<T>().Where(predicate);
-    }
-
-    public async Task<IQueryable<T>> GetAllAsync<T>() where T : class
-    {
-        var result = GetAll<T>();
+        var result = GetList<T>();
         return await Task.FromResult(result);
     }
 
-    public async Task<IQueryable<T>> GetAllAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+    public async Task<IQueryable<T>> GetListAsync<T>(Expression<Func<T, bool>> predicate) where T : class
     {
-        var result = GetAll<T>(predicate);
+        var result = GetList<T>(predicate);
         return await Task.FromResult(result);
     }
     #endregion
 
-    #region GetById
-    public T GetById<T>(int id) where T : class
+    #region GetSingle
+    public T GetSingle<T>(int id) where T : class
     {
-        return Database.Set<T>().Find(id);
+        return database.Set<T>().Find(id);
     }
-    public T GetById<T>(params object[] compositKey) where T : class
+    public T GetSingle<T>(params object[] compositKey) where T : class
     {
-        return Database.Set<T>().Find(compositKey);
+        return database.Set<T>().Find(compositKey);
     }
-    public T GetById<T>(string primaryKeyValue) where T : class
+    public T GetSingle<T>(string primaryKeyValue) where T : class
     {
-        return Database.Set<T>().Find(primaryKeyValue);
+        return database.Set<T>().Find(primaryKeyValue);
     }
-    public T GetById<T>(Expression<Func<T, bool>> predicate) where T : class
+    public T GetSingle<T>(Expression<Func<T, bool>> predicate) where T : class
     {
-        return Database.Set<T>().FirstOrDefault(predicate);
+        return database.Set<T>().FirstOrDefault(predicate);
     }
 
 
-    public async Task<T> GetByIdAsync<T>(int id) where T : class
+    public async Task<T> GetSingleAsync<T>(int id) where T : class
     {
-        return await Database.Set<T>().FindAsync(id);
+        return await database.Set<T>().FindAsync(id);
     }
-    public async Task<T> GetByIdAsync<T>(params object[] strCompositKey) where T : class
+    public async Task<T> GetSingleAsync<T>(params object[] strCompositKey) where T : class
     {
-        return await Database.Set<T>().FindAsync(strCompositKey);
+        return await database.Set<T>().FindAsync(strCompositKey);
     }
-    public async Task<T> GetByIdAsync<T>(string primaryKeyValue) where T : class
+    public async Task<T> GetSingleAsync<T>(string primaryKeyValue) where T : class
     {
-        return await Database.Set<T>().FindAsync(primaryKeyValue);
+        return await database.Set<T>().FindAsync(primaryKeyValue);
     }
-    public async Task<T> GetByIdAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+    public async Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate) where T : class
     {
-        return await Database.Set<T>().FirstOrDefaultAsync(predicate);
+        return await database.Set<T>().FirstOrDefaultAsync(predicate);
     }
     #endregion
 
-    #region Insert
-    public T Insert<T>(T entity) where T : class
+    #region Create
+    public T Create<T>(T entity) where T : class
     {
-        Database.Set<T>().Add(entity);
-        Database.SaveChanges();
+        database.Set<T>().Add(entity);
+        database.SaveChanges();
         return entity;
     }
 
-    public List<T> Insert<T>(List<T> entityList) where T : class
+    public List<T> Create<T>(List<T> entityList) where T : class
     {
-        Database.Set<T>().AddRange(entityList);
-        Database.SaveChanges();
+        database.Set<T>().AddRange(entityList);
+        database.SaveChanges();
         return entityList;
     }
 
-    public async Task<T> InsertAsync<T>(T entity) where T : class
+    public async Task<T> CreateAsync<T>(T entity) where T : class
     {
-        await Database.Set<T>().AddAsync(entity);
-        await Database.SaveChangesAsync();
+        await database.Set<T>().AddAsync(entity);
+        await database.SaveChangesAsync();
         return entity;
     }
 
-    public async Task<List<T>> InsertAsync<T>(List<T> entityList) where T : class
+    public async Task<List<T>> CreateAsync<T>(List<T> entityList) where T : class
     {
-        await Database.Set<T>().AddRangeAsync(entityList);
-        await Database.SaveChangesAsync();
+        await database.Set<T>().AddRangeAsync(entityList);
+        await database.SaveChangesAsync();
         return entityList;
+    }
+
+    public async Task<TDest> CreateWithMapperAsync<TSource, TDest>(TSource source) where TDest : class
+    {
+        var entity = mapper.Map<TDest>(source);
+        await database.Set<TDest>().AddAsync(entity);
+        await database.SaveChangesAsync();
+        return entity;
     }
     #endregion
 
     #region Update
-    public void Update<T>(T entity) where T : class
+    public int Update<T>(T entity) where T : class
     {
-        Database.Entry(entity).State = EntityState.Modified;
-        Database.SaveChanges();
+        database.Entry(entity).State = EntityState.Modified;
+        return database.SaveChanges();
     }
 
-    public async Task UpdateAsync<T>(T entity) where T : class
+    public async Task<int> UpdateAsync<T>(T entity) where T : class
     {
-        Database.Entry(entity).State = EntityState.Modified;
-        await Database.SaveChangesAsync();
+        database.Entry(entity).State = EntityState.Modified;
+        return await database.SaveChangesAsync();
+    }
+    public int Update<T>(List<T> entities) where T : class
+    {
+        foreach (var entity in entities)
+        {
+            database.Entry(entity).State = EntityState.Modified;
+        }
+        return database.SaveChanges();
+    }
+
+    public async Task<int> UpdateAsync<T>(List<T> entities) where T : class
+    {
+        foreach (var entity in entities)
+        {
+            database.Entry(entity).State = EntityState.Modified;
+        }
+        return await database.SaveChangesAsync();
+    }
+
+    #endregion
+
+    #region Delete
+    public int Delete<T>(int id) where T : class
+    {
+        T? set = database.Set<T>().Find(id);
+        if (set != null)
+        {
+            database.Set<T>().Remove(set);
+            return database.SaveChanges();
+        }
+        return 0;
+    }
+
+    public async Task<int> DeleteAsync<T>(int id) where T : class
+    {
+        T? set = await database.Set<T>().FindAsync(id);
+        if (set != null)
+        {
+            database.Set<T>().Remove(set);
+            return await database.SaveChangesAsync();
+        }
+        return 0;
+    }
+    public int Delete<T>(params int[] ids) where T : class
+    {
+        foreach (var id in ids)
+        {
+            T? set = database.Set<T>().Find(id);
+            if (set != null)
+            {
+                database.Set<T>().Remove(set);
+            }
+        }
+        return database.SaveChanges();
+    }
+
+    public async Task<int> DeleteAsync<T>(params int[] ids) where T : class
+    {
+        foreach (int id in ids)
+        {
+            T? set = await database.Set<T>().FindAsync(id);
+            if (set != null)
+            {
+                database.Set<T>().Remove(set);
+            }
+        }
+        return await database.SaveChangesAsync();
+    }
+
+    public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
+    {
+        var sets = database.Set<T>().Where(predicate);
+        foreach (var set in sets)
+        {
+            database.Set<T>().Remove(set);
+        }
+        return database.SaveChanges();
+    }
+
+    public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+    {
+        var sets = database.Set<T>().Where(predicate);
+        foreach (var set in sets)
+        {
+            database.Set<T>().Remove(set);
+        }
+        return await database.SaveChangesAsync();
     }
     #endregion
 }

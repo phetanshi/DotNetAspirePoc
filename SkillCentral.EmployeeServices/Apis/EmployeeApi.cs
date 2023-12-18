@@ -10,7 +10,7 @@ public static class EmployeeApi
     {
         app.MapGet("/employeesvc/employees", async (IEmployeeService employeeService) =>
         {
-            var data = await employeeService.Get();
+            var data = await employeeService.GetAsync();
             ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
             if(data is not null && data.Count > 0)
             {
@@ -30,7 +30,7 @@ public static class EmployeeApi
 
         app.MapGet("/employeesvc/employeebyid", async (IEmployeeService employeeService, [FromQuery]string userId) =>
         {
-            var data = await employeeService.Get(userId);
+            var data = await employeeService.GetAsync(userId);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             if (data is not null)
             {
@@ -49,7 +49,7 @@ public static class EmployeeApi
 
         app.MapPost("/employeesvc/create", async (IEmployeeService employeeService, [FromBody] EmployeeCreateDto employee) =>
         {
-            var data = await employeeService.Create(employee);
+            var data = await employeeService.CreateAsync(employee);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             if (data is not null)
             {
@@ -68,7 +68,7 @@ public static class EmployeeApi
 
         app.MapDelete("/employeesvc/update", async (IEmployeeService employeeService, [FromBody] EmployeeDto employee) =>
         {
-            var data = await employeeService.Update(employee);
+            var data = await employeeService.UpdateAsync(employee);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             apiResponse.IsSuccess = data is not null ? true : false;
             apiResponse.Message = data is not null ? "" : "Something went wrong!";
@@ -80,7 +80,7 @@ public static class EmployeeApi
 
         app.MapDelete("/employeesvc/delete", async (IEmployeeService employeeService, [FromBody] string userId) =>
         {
-            var data = await employeeService.Delete(userId);
+            var data = await employeeService.DeleteAsync(userId);
             ApiResponse<bool> apiResponse = new ApiResponse<bool>();
             apiResponse.IsSuccess = data;
             apiResponse.Message = data ? "" : "Something went wrong!";

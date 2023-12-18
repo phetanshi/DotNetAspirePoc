@@ -6,5 +6,6 @@ namespace SkillCentral.SkillServices.Services
     {
         Task<List<EmployeeSkillDto>> GetAsync(string userId);
         Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill);
+        Task<bool> RemoveSkill(string userId, int skillId);
     }
 }
