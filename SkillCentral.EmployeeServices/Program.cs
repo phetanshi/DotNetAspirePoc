@@ -4,6 +4,10 @@ using SkillCentral.EmployeeServices.Services;
 using SkillCentral.Repository;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SkillCentral.ServiceDefaults;
+using SkillCentral.EmployeeServices.Data.DbModels;
+using SkillCentral.EmployeeServices.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServerRepository<EmployeeDbContext>(builder.Configuration);
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<EmployeeMQContract>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -31,3 +36,8 @@ app.UseHttpsRedirection();
 
 app.MapEmployeeApiEndpoints();
 app.Run();
+
+app.Services.CreateScope()
+    .ServiceProvider
+    .GetService<EmployeeMQContract>()
+    .HandleGetEmployeeRequest();

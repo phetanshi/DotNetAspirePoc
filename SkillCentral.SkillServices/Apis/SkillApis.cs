@@ -14,7 +14,7 @@ namespace SkillCentral.SkillServices.Apis
                 ApiResponse<List<SkillDto>> apiResponse = new ApiResponse<List<SkillDto>>();
 
                 apiResponse.IsSuccess = true;
-                apiResponse.Message = data is null ? "Something went wrong!" : "";
+                apiResponse.Message = data is null ? "Something went wrong!" : "Skill details were found!";
                 apiResponse.Payload = data;
                 return apiResponse;
             })
@@ -27,7 +27,7 @@ namespace SkillCentral.SkillServices.Apis
                 ApiResponse<SkillDto> apiResponse = new ApiResponse<SkillDto>();
 
                 apiResponse.IsSuccess = true;
-                apiResponse.Message = data is null ? "Details did not found!" : "";
+                apiResponse.Message = data is null ? "Details were not found!" : "Skill details were found!";
                 apiResponse.Payload = data;
                 return apiResponse;
             })
@@ -40,7 +40,7 @@ namespace SkillCentral.SkillServices.Apis
                 ApiResponse<SkillDto> apiResponse = new ApiResponse<SkillDto>();
 
                 apiResponse.IsSuccess = data is not null ? true : false;
-                apiResponse.Message = data is null ? "Something went wrong!" : "";
+                apiResponse.Message = data is null ? "Something went wrong!" : "New skill have been created!";
                 apiResponse.Payload = data;
                 return apiResponse;
             })
@@ -53,7 +53,7 @@ namespace SkillCentral.SkillServices.Apis
                 ApiResponse<SkillDto> apiResponse = new ApiResponse<SkillDto>();
 
                 apiResponse.IsSuccess = data is not null ? true : false;
-                apiResponse.Message = data is null ? "Something went wrong!" : "";
+                apiResponse.Message = data is null ? "Something went wrong!" : "Skill have been updated successfully!";
                 apiResponse.Payload = data;
                 return apiResponse;
             })
@@ -66,7 +66,7 @@ namespace SkillCentral.SkillServices.Apis
                 ApiResponse<bool> apiResponse = new ApiResponse<bool>();
 
                 apiResponse.IsSuccess = data;
-                apiResponse.Message = !data ? "Something went wrong!" : "";
+                apiResponse.Message = !data ? "Something went wrong!" : "Skill have been deleted successfully!";
                 apiResponse.Payload = data;
                 return apiResponse;
             })

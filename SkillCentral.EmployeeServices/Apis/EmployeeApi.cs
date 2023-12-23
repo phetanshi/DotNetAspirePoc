@@ -13,7 +13,7 @@ public static class EmployeeApi
             var data = await employeeService.GetAsync();
             ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
             apiResponse.IsSuccess = true;
-            apiResponse.Message = data is null ? "Something went wrong!" : "";
+            apiResponse.Message = data is null ? "Something went wrong!" : "Employee list found!";
             apiResponse.Payload = data;
 
             return apiResponse;
@@ -26,7 +26,7 @@ public static class EmployeeApi
             var data = await employeeService.GetAsync(userId);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             apiResponse.IsSuccess = true;
-            apiResponse.Message = data is null ? "Data did not found!" : "";
+            apiResponse.Message = data is null ? "Employee details were not found!" : "Employee details found!";
             apiResponse.Payload = data;
 
             return apiResponse;
@@ -43,6 +43,7 @@ public static class EmployeeApi
             {
                 apiResponse.Payload = data;
                 apiResponse.IsSuccess = true;
+                apiResponse.Message = "Employee created successfylly!";
             }
             else
             {
@@ -60,7 +61,7 @@ public static class EmployeeApi
             var data = await employeeService.UpdateAsync(employee);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             apiResponse.IsSuccess = data is not null ? true : false;
-            apiResponse.Message = data is not null ? "" : "Something went wrong!";
+            apiResponse.Message = data is not null ? "Employee details updated successfully!" : "Something went wrong!";
             apiResponse.Payload = data;
             return apiResponse;
         })
@@ -73,8 +74,8 @@ public static class EmployeeApi
             var data = await employeeService.DeleteAsync(userId);
             ApiResponse<bool> apiResponse = new ApiResponse<bool>();
             apiResponse.IsSuccess = data;
-            apiResponse.Message = data ? "" : "Something went wrong!";
-
+            apiResponse.Message = data ? "Employee deleted successfully!" : "Something went wrong!";
+            apiResponse.Payload = data;
             return apiResponse;
         })
         .WithName("DeleteEmployee")

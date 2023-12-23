@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using SkillCentral.ServiceDefaults;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -17,6 +18,9 @@ public static class Extensions
 
         builder.AddDefaultHealthChecks();
 
+        builder.AddRabbitMQ("messaging");
+
+        builder.Services.AddSingleton<IMQUtil, MQUtil>();
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>

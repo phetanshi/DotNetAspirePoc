@@ -1,11 +1,18 @@
 ﻿using AutoMapper;
+using Google.Protobuf;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using SkillCentral.Dtos;
 using SkillCentral.Repository;
+using SkillCentral.ServiceDefaults;
 using SkillCentral.SkillServices.Data.DbModels;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
 
 namespace SkillCentral.SkillServices.Services
 {
-    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
+    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IMQUtil queueService, ISkillService skillService, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
     {
         public async Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill)
         {
@@ -16,8 +23,8 @@ namespace SkillCentral.SkillServices.Services
             dbEmpSkill.DateCreated = DateTime.Now;
             dbEmpSkill.CreatedUserId = GetLoginUserId();
             dbEmpSkill = await repository.CreateAsync(dbEmpSkill);
-
-            return mapper.Map<EmployeeSkillDto>(dbEmpSkill);
+            var dto = await BindEmployeeSkillData(dbEmpSkill);
+            return dto;
         }
 
         public async Task<List<EmployeeSkillDto>> GetAsync(string userId)
@@ -25,9 +32,17 @@ namespace SkillCentral.SkillServices.Services
             if (userId is null)
                 throw new ArgumentNullException("userid cannot be null");
 
-            var data = await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower());
-            if (data is not null)
-                return mapper.Map<List<EmployeeSkillDto>>(data);
+            var data = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower()))?.ToList();
+            if (data is not null && data.Count > 0)
+            {
+                var empDtoList = new List<EmployeeSkillDto>();
+                foreach(var item in data)
+                {
+                    var dto = await BindEmployeeSkillData(item);
+                    empDtoList.Add(dto);
+                }
+                return empDtoList;
+            }
             return new List<EmployeeSkillDto>();
         }
 
@@ -43,5 +58,16 @@ namespace SkillCentral.SkillServices.Services
             int count = await repository.UpdateAsync(record);
             return count > 0;
         }
+
+
+        #region PrivateMethods
+        private async Task<EmployeeSkillDto> BindEmployeeSkillData(EmployeeSkill item)
+        {
+            EmployeeSkillDto dto = mapper.Map<EmployeeSkillDto>(item);
+            dto.Employee = queueService.GetResponse<string, EmployeeDto>(item.UserId);
+            dto.Skill = await skillService.GetAsync(item.SkillId);
+            return dto;
+        }
+        #endregion
     }
 }
