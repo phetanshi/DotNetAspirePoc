@@ -1,7 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedisContainer("cache");
-var messaging = builder.AddRabbitMQContainer("messaging");
+var messaging = builder.AddRabbitMQContainer("messaging", 15672);
 
 var skillService = builder.AddProject<Projects.SkillCentral_SkillServices>("skillservices")
     .WithReference(messaging);

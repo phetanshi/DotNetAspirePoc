@@ -20,7 +20,7 @@ public static class Extensions
 
         builder.AddRabbitMQ("messaging");
 
-        builder.Services.AddSingleton<IMQUtil, MQUtil>();
+        builder.Services.AddSingleton<IMQService, MQService>();
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>

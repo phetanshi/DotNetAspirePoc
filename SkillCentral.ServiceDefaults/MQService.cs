@@ -5,11 +5,11 @@ using System.Text.Json;
 
 namespace SkillCentral.ServiceDefaults
 {
-    public class MQUtil : IMQUtil
+    public class MQService : IMQService
     {
         private readonly IModel _channel;
         private readonly IConnection _connection;
-        public MQUtil(IConnection connection)
+        public MQService(IConnection connection)
         {
             _connection = connection;
             _channel = connection.CreateModel();

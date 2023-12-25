@@ -5,7 +5,7 @@ using SkillCentral.ServiceDefaults;
 
 namespace SkillCentral.EmployeeServices.Contracts
 {
-    public class EmployeeMQContract(IMQUtil queueService, IEmployeeService employeeService, ILogger<EmployeeMQContract> logger)
+    public class EmployeeMQContract(IMQService queueService, IEmployeeService employeeService, ILogger<EmployeeMQContract> logger)
     {
         public void HandleGetEmployeeRequest()
         {

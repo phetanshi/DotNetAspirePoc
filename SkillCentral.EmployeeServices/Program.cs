@@ -35,9 +35,11 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.MapEmployeeApiEndpoints();
-app.Run();
 
 app.Services.CreateScope()
     .ServiceProvider
     .GetService<EmployeeMQContract>()
     .HandleGetEmployeeRequest();
+
+app.Run();
+

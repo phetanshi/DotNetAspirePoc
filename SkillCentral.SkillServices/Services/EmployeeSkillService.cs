@@ -12,7 +12,7 @@ using System.Threading.Channels;
 
 namespace SkillCentral.SkillServices.Services
 {
-    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IMQUtil queueService, ISkillService skillService, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
+    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IMQService queueService, ISkillService skillService, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
     {
         public async Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill)
         {
