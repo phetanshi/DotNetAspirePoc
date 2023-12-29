@@ -1,13 +1,9 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkillCentral.EmployeeServices.Apis;
+using SkillCentral.EmployeeServices.Contracts;
 using SkillCentral.EmployeeServices.Data;
 using SkillCentral.EmployeeServices.Services;
 using SkillCentral.Repository;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using SkillCentral.ServiceDefaults;
-using SkillCentral.EmployeeServices.Data.DbModels;
-using SkillCentral.EmployeeServices.Contracts;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +32,7 @@ app.UseHttpsRedirection();
 
 app.MapEmployeeApiEndpoints();
 
-app.Services.CreateScope()
+await app.Services.CreateScope()
     .ServiceProvider
     .GetService<EmployeeMQContract>()
     .HandleGetEmployeeRequest();

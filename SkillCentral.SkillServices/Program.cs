@@ -1,11 +1,9 @@
-using SkillCentral.SkillServices.Apis;
-using SkillCentral.SkillServices.Data;
-using SkillCentral.Repository;
-using SkillCentral.SkillServices.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SkillCentral.SkillServices;
-using SkillCentral.SkillServices.Utils;
-using SkillCentral.ServiceDefaults;
+using SkillCentral.Repository;
+using SkillCentral.SkillServices.Apis;
+using SkillCentral.SkillServices.Contracts;
+using SkillCentral.SkillServices.Data;
+using SkillCentral.SkillServices.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +21,8 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddSingleton<EmployeeMQContract>();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -31,9 +31,17 @@ app.MapDefaultEndpoints();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+
+
 app.UseHttpsRedirection();
 app.MapEmployeeSkillApiEndpoints();
 app.MapSkillApiEndpoints();
 
+app.Services.GetService<EmployeeMQContract>().InvokeAsync();
 app.Run();
 
+
+//app.Services.CreateScope()
+//                    .ServiceProvider
+//                    .GetService<EmployeeMQContract>()
+//                    .InvokeAsync();

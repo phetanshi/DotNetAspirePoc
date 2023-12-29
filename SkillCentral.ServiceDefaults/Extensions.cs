@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using SkillCentral.ServiceDefaults;
+using Ps.RabbitMq.Client;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -18,9 +18,8 @@ public static class Extensions
 
         builder.AddDefaultHealthChecks();
 
-        builder.AddRabbitMQ("messaging");
+        builder.AddRabbitMqCustomClient("messaging");
 
-        builder.Services.AddSingleton<IMQService, MQService>();
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>

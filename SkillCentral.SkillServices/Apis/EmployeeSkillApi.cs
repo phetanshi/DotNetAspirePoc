@@ -1,4 +1,5 @@
-﻿using SkillCentral.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using SkillCentral.Dtos;
 using SkillCentral.SkillServices.Services;
 
 namespace SkillCentral.SkillServices.Apis;
@@ -32,6 +33,20 @@ public static class EmployeeSkillApi
             return apiResponse;
         })
         .WithName("AddEmployeeSkill")
+        .WithOpenApi();
+
+        app.MapDelete("/skillsvc/deleteuserskills", async (IEmployeeSkillService employeeSkillService, [FromBody]string userId) =>
+        {
+            var data = await employeeSkillService.RemoveSkillsAsync(userId);
+
+            ApiResponse<bool> apiResponse = new ApiResponse<bool>();
+
+            apiResponse.IsSuccess = data;
+            apiResponse.Message = !data ? "Something went wrong!" : "";
+            apiResponse.Payload = data;
+            return apiResponse;
+        })
+        .WithName("DeleteEmployeeSkill")
         .WithOpenApi();
     }
 }

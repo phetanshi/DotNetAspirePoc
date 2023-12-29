@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
-using Google.Protobuf;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using Ps.RabbitMq.Client;
 using SkillCentral.Dtos;
 using SkillCentral.Repository;
-using SkillCentral.ServiceDefaults;
 using SkillCentral.SkillServices.Data.DbModels;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Channels;
 
 namespace SkillCentral.SkillServices.Services
 {
-    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IMQService queueService, ISkillService skillService, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
+    public class EmployeeSkillService(IRepository repository, IMapper mapper, ILogger<EmployeeSkillService> logger, IMqRequestService requestQueueService, IMqPubSubService pubSubQueueService, ISkillService skillService, IHttpContextAccessor context) : ServiceBase(context), IEmployeeSkillService
     {
         public async Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill)
         {
@@ -32,7 +26,7 @@ namespace SkillCentral.SkillServices.Services
             if (userId is null)
                 throw new ArgumentNullException("userid cannot be null");
 
-            var data = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower()))?.ToList();
+            var data = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.IsActive))?.ToList();
             if (data is not null && data.Count > 0)
             {
                 var empDtoList = new List<EmployeeSkillDto>();
@@ -46,7 +40,7 @@ namespace SkillCentral.SkillServices.Services
             return new List<EmployeeSkillDto>();
         }
 
-        public async Task<bool> RemoveSkill(string userId, int skillId)
+        public async Task<bool> RemoveSkillAsync(string userId, int skillId)
         {
             if (userId is null || skillId == 0)
                 throw new ArgumentNullException("userid cannot be null");
@@ -58,13 +52,30 @@ namespace SkillCentral.SkillServices.Services
             int count = await repository.UpdateAsync(record);
             return count > 0;
         }
+        public async Task<bool> RemoveSkillsAsync(string userId)
+        {
+            if (userId is null)
+                throw new ArgumentNullException("userid cannot be null");
 
+            var records = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower())).ToList();
+            if (records is not null && records.Any())
+            {
+                foreach (var record in records)
+                {
+                    record.IsActive = false;
+                    record.DateUpdated = DateTime.UtcNow;
+                    record.UpdatedUserId = GetLoginUserId();
+                    await repository.UpdateAsync(record);
+                }
+            }
+            return true;
+        }
 
         #region PrivateMethods
         private async Task<EmployeeSkillDto> BindEmployeeSkillData(EmployeeSkill item)
         {
             EmployeeSkillDto dto = mapper.Map<EmployeeSkillDto>(item);
-            dto.Employee = queueService.GetResponse<string, EmployeeDto>(item.UserId);
+            dto.Employee = await requestQueueService.GetResponseAsync<string, EmployeeDto>(item.UserId);
             dto.Skill = await skillService.GetAsync(item.SkillId);
             return dto;
         }

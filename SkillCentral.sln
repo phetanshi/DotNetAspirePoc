@@ -17,11 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.AppHost", "Ski
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.ServiceDefaults", "SkillCentral.ServiceDefaults\SkillCentral.ServiceDefaults.csproj", "{B4479156-07E1-4697-969A-DE5859A81988}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillCentral.AppComponents", "SkillCentral.AppComponents\SkillCentral.AppComponents.csproj", "{874F8DFB-5FF0-4970-964D-B03B0EDF067E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.AppComponents", "SkillCentral.AppComponents\SkillCentral.AppComponents.csproj", "{874F8DFB-5FF0-4970-964D-B03B0EDF067E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.NotificationServices", "SkillCentral.NotificationServices\SkillCentral.NotificationServices.csproj", "{FA2D6C6D-57C0-42D0-9107-1D3F17551266}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillCentral.Repository", "SkillCentral.Repository\SkillCentral.Repository.csproj", "{20CEA266-EE88-4653-B7B6-C1673672879B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.Repository", "SkillCentral.Repository\SkillCentral.Repository.csproj", "{20CEA266-EE88-4653-B7B6-C1673672879B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ps.RabbitMq.Client", "Ps.RabbitMq.Client\Ps.RabbitMq.Client.csproj", "{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,18 @@ Global
 		{20CEA266-EE88-4653-B7B6-C1673672879B}.Release|x64.Build.0 = Release|Any CPU
 		{20CEA266-EE88-4653-B7B6-C1673672879B}.Release|x86.ActiveCfg = Release|Any CPU
 		{20CEA266-EE88-4653-B7B6-C1673672879B}.Release|x86.Build.0 = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|x64.Build.0 = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|x64.ActiveCfg = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|x64.Build.0 = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
