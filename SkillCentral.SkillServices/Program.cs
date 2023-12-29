@@ -21,7 +21,8 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddSingleton<EmployeeMQContract>();
+//builder.Services.AddSingleton<EmployeeMQContract>();
+builder.Services.AddHostedService<EmployeeSkillHostedService>();
 
 var app = builder.Build();
 
@@ -37,11 +38,4 @@ app.UseHttpsRedirection();
 app.MapEmployeeSkillApiEndpoints();
 app.MapSkillApiEndpoints();
 
-app.Services.GetService<EmployeeMQContract>().InvokeAsync();
 app.Run();
-
-
-//app.Services.CreateScope()
-//                    .ServiceProvider
-//                    .GetService<EmployeeMQContract>()
-//                    .InvokeAsync();

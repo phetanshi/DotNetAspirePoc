@@ -12,6 +12,8 @@ public class Notification
     public string Message { get; set; }
     public bool? IsCompleted { get; set; }
     public string UserId { get; set; }
+    public bool IsAdmin { get; set; }
+    public bool IsSupport { get; set; }
 
 
     public bool IsActive { get; set; }

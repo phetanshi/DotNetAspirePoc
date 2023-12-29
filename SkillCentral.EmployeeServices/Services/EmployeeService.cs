@@ -75,7 +75,7 @@ namespace SkillCentral.EmployeeServices.Services
             var empDto = mapper.Map<EmployeeDto>(dbEmp);
 
             if (isSuccess)
-                pubSubQueueService.PublishTopicAsync(empDto, MQConstants.DELETE_EMPLOYEE);
+                pubSubQueueService.PublishTopicAsync(empDto, MQConstants.EMPLOYEE_DELETE_ROUTE_KEY);
 
             return isSuccess;
         }

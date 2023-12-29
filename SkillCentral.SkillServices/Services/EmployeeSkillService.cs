@@ -3,6 +3,7 @@ using Ps.RabbitMq.Client;
 using SkillCentral.Dtos;
 using SkillCentral.Repository;
 using SkillCentral.SkillServices.Data.DbModels;
+using SkillCentral.SkillServices.Utils;
 
 namespace SkillCentral.SkillServices.Services
 {
@@ -18,6 +19,8 @@ namespace SkillCentral.SkillServices.Services
             dbEmpSkill.CreatedUserId = GetLoginUserId();
             dbEmpSkill = await repository.CreateAsync(dbEmpSkill);
             var dto = await BindEmployeeSkillData(dbEmpSkill);
+
+            await SendNotification(dto.Employee?.UserId ?? "", SkillServiceConstants.EMPLOYEE_SKILL_ADDED, MQConstants.EMPLOYEE_SKILL_ADDED_ROUTE_KEY);
             return dto;
         }
 
@@ -40,22 +43,42 @@ namespace SkillCentral.SkillServices.Services
             return new List<EmployeeSkillDto>();
         }
 
+        public async Task<EmployeeSkillDto> GetAsync(string userId, int skillId)
+        {
+            if (userId is null || skillId  == 0)
+                throw new ArgumentNullException("User Id cannot be null or Skill Id cannot be 0");
+
+            var data = await repository.GetSingleAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.IsActive);
+            if (data is not null)
+            {
+                return await BindEmployeeSkillData(data);
+            }
+            return null;
+        }
+
         public async Task<bool> RemoveSkillAsync(string userId, int skillId)
         {
             if (userId is null || skillId == 0)
-                throw new ArgumentNullException("userid cannot be null");
+                throw new ArgumentNullException("User id cannot be null");
 
             var record = await repository.GetSingleAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.SkillId == skillId);
             record.IsActive = false;
             record.DateUpdated = DateTime.UtcNow;
             record.UpdatedUserId = GetLoginUserId();
             int count = await repository.UpdateAsync(record);
-            return count > 0;
+            bool isTrue = count > 0;
+
+            if (isTrue)
+            {
+                await SendNotification(userId, SkillServiceConstants.EMPLOYEE_SKILL_DELETED, MQConstants.EMPLOYEE_SKILL_DELETED_ROUTE_KEY);
+            }
+
+            return isTrue;
         }
         public async Task<bool> RemoveSkillsAsync(string userId)
         {
             if (userId is null)
-                throw new ArgumentNullException("userid cannot be null");
+                throw new ArgumentNullException("User id cannot be null");
 
             var records = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower())).ToList();
             if (records is not null && records.Any())
@@ -68,6 +91,8 @@ namespace SkillCentral.SkillServices.Services
                     await repository.UpdateAsync(record);
                 }
             }
+
+            await SendNotification(userId, SkillServiceConstants.EMPLOYEE_ALL_SKILL_DELETED, MQConstants.EMPLOYEE_SKILL_DELETED_ROUTE_KEY);
             return true;
         }
 
@@ -78,6 +103,15 @@ namespace SkillCentral.SkillServices.Services
             dto.Employee = await requestQueueService.GetResponseAsync<string, EmployeeDto>(item.UserId);
             dto.Skill = await skillService.GetAsync(item.SkillId);
             return dto;
+        }
+
+        private async Task SendNotification(string userId, string notification, string routeKey)
+        {
+            NotificationCreateDto notificationDto = new NotificationCreateDto();
+            notificationDto.UserId = userId;
+            notificationDto.Notification = notification;
+            notificationDto.IsCompleted = false;
+            await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
         }
         #endregion
     }

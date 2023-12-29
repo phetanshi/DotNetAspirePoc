@@ -5,11 +5,14 @@ using SkillCentral.SkillServices.Services;
 
 namespace SkillCentral.SkillServices.Contracts
 {
-    public class EmployeeMQContract(IServiceProvider serviceProvider, IConnection connection, IMqPubSubService rabbitPubSubService, ILogger<EmployeeMQContract> logger)
+    public class EmployeeSkillHostedService(IServiceProvider serviceProvider, IMqPubSubService rabbitPubSubService, ILogger<EmployeeSkillHostedService> logger) : BackgroundService
     {
         private readonly IEmployeeSkillService _empSkillService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IEmployeeSkillService>();
-
-        public async Task InvokeAsync()
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            return base.StartAsync(cancellationToken);
+        }
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await rabbitPubSubService.ConsumeTopicAsync<EmployeeDto>(MQConstants.EMPLOYEE_DELETE_ROUTE_KEY, async (emp) =>
             {
@@ -17,6 +20,11 @@ namespace SkillCentral.SkillServices.Contracts
                     return;
                 await _empSkillService.RemoveSkillsAsync(emp.UserId);
             });
+        }
+
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            return base.StopAsync(cancellationToken);
         }
     }
 }

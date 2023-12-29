@@ -42,7 +42,13 @@ namespace SkillCentral.NotificationServices.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSupport")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")

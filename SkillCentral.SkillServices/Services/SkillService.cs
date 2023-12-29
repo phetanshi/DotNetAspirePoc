@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
+using Ps.RabbitMq.Client;
 using SkillCentral.Dtos;
 using SkillCentral.Repository;
 using SkillCentral.SkillServices.Data.DbModels;
+using SkillCentral.SkillServices.Utils;
 
 namespace SkillCentral.SkillServices.Services
 {
-    public class SkillService(IRepository repository, IMapper mapper, ILogger<SkillService> logger, IHttpContextAccessor context) : ServiceBase(context), ISkillService
+    public class SkillService(IRepository repository, IMapper mapper, ILogger<SkillService> logger, IHttpContextAccessor context, IMqPubSubService pubSubQueueService) : ServiceBase(context), ISkillService
     {
         public async Task<SkillDto> CreateAsync(SkillCreateDto skill)
         {
@@ -21,7 +23,9 @@ namespace SkillCentral.SkillServices.Services
             if (skill is null)
                 return null;
 
-            return mapper.Map<SkillDto>(dbSkill);
+            var dto = mapper.Map<SkillDto>(dbSkill);
+            await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_ADDED, routeKey: MQConstants.SKILL_ADDED_ROUTE_KEY);
+            return dto;
         }
 
         public async Task<bool> DeleteAsync(int skillId)
@@ -31,7 +35,9 @@ namespace SkillCentral.SkillServices.Services
             skill.DateUpdated = DateTime.UtcNow;
             skill.UpdatedUserId = GetLoginUserId();
             int count = await repository.UpdateAsync(skill);
-            return count > 0;
+            bool isDeleted = count > 0;
+            await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_DELETED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
+            return isDeleted;
         }
 
         public async Task<SkillDto> GetAsync(int skillId)
@@ -67,9 +73,24 @@ namespace SkillCentral.SkillServices.Services
 
             int count = await repository.UpdateAsync(updatedData);
             if (count > 0)
+            {
+                await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_UPDATED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
                 return mapper.Map<SkillDto>(updatedData);
-
+            }
             return null;
         }
+
+        #region PrivateMethods
+        private async Task SendNotification(string userId, bool isAdmin, bool isSupport, string notification, string routeKey)
+        {
+            NotificationCreateDto notificationDto = new NotificationCreateDto();
+            notificationDto.UserId = userId;
+            notificationDto.IsAdmin = isAdmin;
+            notificationDto.IsSupport = isSupport;
+            notificationDto.Notification = notification;
+            notificationDto.IsCompleted = false;
+            await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
+        }
+        #endregion
     }
 }

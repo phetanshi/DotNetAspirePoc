@@ -5,6 +5,7 @@ namespace SkillCentral.SkillServices.Services
     public interface IEmployeeSkillService
     {
         Task<List<EmployeeSkillDto>> GetAsync(string userId);
+        Task<EmployeeSkillDto> GetAsync(string userId, int skillId);
         Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill);
         Task<bool> RemoveSkillAsync(string userId, int skillId);
         Task<bool> RemoveSkillsAsync(string userId);

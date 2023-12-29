@@ -12,8 +12,8 @@ using SkillCentral.NotificationServices.Data;
 namespace SkillCentral.NotificationServices.Migrations
 {
     [DbContext(typeof(NotificationDbContext))]
-    [Migration("20231217143121_Initial")]
-    partial class Initial
+    [Migration("20231229164421_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,7 +45,13 @@ namespace SkillCentral.NotificationServices.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSupport")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")
