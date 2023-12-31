@@ -19,7 +19,35 @@ public static class NotificationApi
 
             return apiResponse;
         })
-        .WithName("GetNotification")
+        .WithName("GetAllUserNotifications")
+        .WithOpenApi();
+
+        app.MapGet("/notificationsvc/adminnotifications", async (INotificationService notificaitonService) =>
+        {
+            var data = await notificaitonService.GetAdminAsync();
+            ApiResponse<List<NotificationDto>> apiResponse = new ApiResponse<List<NotificationDto>>();
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = data is null ? "Data did not found!" : "";
+            apiResponse.Payload = data;
+
+            return apiResponse;
+        })
+        .WithName("GetAdminNotifications")
+        .WithOpenApi();
+
+        app.MapGet("/notificationsvc/supportnotifications", async (INotificationService notificaitonService) =>
+        {
+            var data = await notificaitonService.GetSupportAsync();
+            ApiResponse<List<NotificationDto>> apiResponse = new ApiResponse<List<NotificationDto>>();
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = data is null ? "Data did not found!" : "";
+            apiResponse.Payload = data;
+
+            return apiResponse;
+        })
+        .WithName("GetSupportNotifications")
         .WithOpenApi();
 
         app.MapPost("/notificationsvc/addnotification", async (INotificationService notificaitonService, NotificationCreateDto notification) =>
@@ -32,7 +60,7 @@ public static class NotificationApi
             apiResponse.Payload = data;
             return apiResponse;
         })
-        .WithName("GetNotification")
+        .WithName("GetNotificationDetails")
         .WithOpenApi();
 
         app.MapPut("/notificationsvc/markascompleted", async (INotificationService notificaitonService, [FromBody] int notificationId) =>

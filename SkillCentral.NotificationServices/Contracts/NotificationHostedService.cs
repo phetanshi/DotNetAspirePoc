@@ -7,7 +7,7 @@ namespace SkillCentral.NotificationServices.Contracts
 {
     public class NotificationHostedService(IServiceProvider serviceProvider, IMqPubSubService rabbitPubSubService, ILogger<NotificationHostedService> logger) : BackgroundService
     {
-        private readonly INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
+        
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             return base.StartAsync(cancellationToken);
@@ -16,8 +16,10 @@ namespace SkillCentral.NotificationServices.Contracts
         {
             await rabbitPubSubService.ConsumeTopicAsync<NotificationCreateDto>(MQConstants.EMPLOYEE_SKILL_LIKE_ROUTE_KEY, async (dto) =>
             {
+                INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
                 if (dto is null || string.IsNullOrEmpty(dto.UserId))
                     return;
+                dto.IsCompleted = false;
                 await _notificationService.CreateAsync(dto);
             });
 
@@ -25,6 +27,22 @@ namespace SkillCentral.NotificationServices.Contracts
             {
                 if (dto is null)
                     return;
+
+                INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
+
+                dto.IsAdmin = true;
+                dto.IsSupport = true;
+                dto.IsCompleted = false;
+                await _notificationService.CreateAsync(dto);
+            });
+
+            await rabbitPubSubService.ConsumeTopicAsync<NotificationCreateDto>(MQConstants.EMPLOYEE_LIKE_ROUTE_KEY, async (dto) =>
+            {
+                if (dto is null)
+                    return;
+
+                INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
+                dto.IsCompleted = false;
                 await _notificationService.CreateAsync(dto);
             });
         }

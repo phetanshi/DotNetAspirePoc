@@ -13,6 +13,6 @@ public abstract class ServiceBase
         if (AppHttpContext == null)
             return "Not-Login";
 
-        return AppHttpContext.HttpContext?.User?.Identity?.Name ?? "Not-Login";
+        return AppHttpContext?.HttpContext?.User?.Identity?.Name ?? "Not-Login";
     }
 }

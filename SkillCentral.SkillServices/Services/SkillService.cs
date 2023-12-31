@@ -24,7 +24,7 @@ namespace SkillCentral.SkillServices.Services
                 return null;
 
             var dto = mapper.Map<SkillDto>(dbSkill);
-            await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_ADDED, routeKey: MQConstants.SKILL_ADDED_ROUTE_KEY);
+            await SendNotification(userId: "", notification: SkillServiceConstants.SKILL_ADDED, routeKey: MQConstants.SKILL_ADDED_ROUTE_KEY);
             return dto;
         }
 
@@ -36,7 +36,7 @@ namespace SkillCentral.SkillServices.Services
             skill.UpdatedUserId = GetLoginUserId();
             int count = await repository.UpdateAsync(skill);
             bool isDeleted = count > 0;
-            await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_DELETED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
+            await SendNotification(userId: "", notification: SkillServiceConstants.SKILL_DELETED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
             return isDeleted;
         }
 
@@ -74,21 +74,18 @@ namespace SkillCentral.SkillServices.Services
             int count = await repository.UpdateAsync(updatedData);
             if (count > 0)
             {
-                await SendNotification(userId: "", true, true, notification: SkillServiceConstants.SKILL_UPDATED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
+                await SendNotification(userId: "", notification: SkillServiceConstants.SKILL_UPDATED, routeKey: MQConstants.SKILL_DELETED_ROUTE_KEY);
                 return mapper.Map<SkillDto>(updatedData);
             }
             return null;
         }
 
         #region PrivateMethods
-        private async Task SendNotification(string userId, bool isAdmin, bool isSupport, string notification, string routeKey)
+        private async Task SendNotification(string userId, string notification, string routeKey)
         {
             NotificationCreateDto notificationDto = new NotificationCreateDto();
             notificationDto.UserId = userId;
-            notificationDto.IsAdmin = isAdmin;
-            notificationDto.IsSupport = isSupport;
             notificationDto.Notification = notification;
-            notificationDto.IsCompleted = false;
             await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
         }
         #endregion

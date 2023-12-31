@@ -37,7 +37,7 @@ public class MqRequestService(IConnection connection, MqUtil mqUtil) : IMqReques
         waitHandle.WaitOne();
         return await Task.FromResult(returnVal);
     }
-    public async Task GetRequestAsync<T, TReturn>(Func<T, TReturn> businessLogic, string queueName = "") where T : class where TReturn : class
+    public async Task GetRequestAsync<T, TReturn>(string queueName, Func<T, TReturn> businessLogic) where T : class where TReturn : class
     {
         if (string.IsNullOrEmpty(queueName))
         {

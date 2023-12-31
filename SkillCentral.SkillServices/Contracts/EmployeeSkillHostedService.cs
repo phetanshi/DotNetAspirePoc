@@ -7,7 +7,6 @@ namespace SkillCentral.SkillServices.Contracts
 {
     public class EmployeeSkillHostedService(IServiceProvider serviceProvider, IMqPubSubService rabbitPubSubService, ILogger<EmployeeSkillHostedService> logger) : BackgroundService
     {
-        private readonly IEmployeeSkillService _empSkillService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IEmployeeSkillService>();
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             return base.StartAsync(cancellationToken);
@@ -18,6 +17,8 @@ namespace SkillCentral.SkillServices.Contracts
             {
                 if (emp is null || emp.UserId is null)
                     return;
+
+                IEmployeeSkillService _empSkillService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IEmployeeSkillService>();
                 await _empSkillService.RemoveSkillsAsync(emp.UserId);
             });
         }

@@ -7,10 +7,12 @@ namespace SkillCentral.EmployeeServices.Contracts;
 
 public class EmployeeMQContract(IServiceProvider serviceProvider, IConnection connection, IMqRequestService requestQueueService, ILogger<EmployeeMQContract> logger)
 {
-    private readonly IEmployeeService _employeeService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IEmployeeService>();
-
     public async Task HandleGetEmployeeRequest()
     {
-        await requestQueueService.GetRequestAsync<string, EmployeeDto>(userId => _employeeService.GetAsync(userId).Result, typeof(EmployeeDto).FullName);
+        await requestQueueService.GetRequestAsync<string, EmployeeDto>(typeof(EmployeeDto).FullName, userId =>
+        {
+            IEmployeeService _employeeService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IEmployeeService>();
+            return _employeeService.GetAsync(userId).Result;
+        });
     }
 }

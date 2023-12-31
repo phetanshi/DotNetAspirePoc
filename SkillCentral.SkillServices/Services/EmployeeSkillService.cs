@@ -110,7 +110,6 @@ namespace SkillCentral.SkillServices.Services
             NotificationCreateDto notificationDto = new NotificationCreateDto();
             notificationDto.UserId = userId;
             notificationDto.Notification = notification;
-            notificationDto.IsCompleted = false;
             await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
         }
         #endregion

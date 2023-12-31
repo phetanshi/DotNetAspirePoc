@@ -8,7 +8,8 @@ var skillService = builder.AddProject<Projects.SkillCentral_SkillServices>("skil
 var employeeService = builder.AddProject<Projects.SkillCentral_EmployeeServices>("employeeservices")
     .WithReference(messaging);
 
-var notificationService = builder.AddProject<Projects.SkillCentral_NotificationServices>("notificationservices");
+var notificationService = builder.AddProject<Projects.SkillCentral_NotificationServices>("notificationservices")
+    .WithReference(messaging);
 
 builder.AddProject<Projects.SkillCentral>("skillcentralui")
     .WithReference(skillService)

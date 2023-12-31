@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkillCentral.NotificationServices.Apis;
+using SkillCentral.NotificationServices.Contracts;
 using SkillCentral.NotificationServices.Data;
 using SkillCentral.NotificationServices.Services;
 using SkillCentral.Repository;
@@ -23,6 +24,7 @@ public class Program
         builder.Services.AddScoped<INotificationService, InAppNotificationService>();
         builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        builder.Services.AddHostedService<NotificationHostedService>();
 
         var app = builder.Build();
 
