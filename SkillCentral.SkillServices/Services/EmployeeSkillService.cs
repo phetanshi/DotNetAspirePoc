@@ -12,7 +12,7 @@ namespace SkillCentral.SkillServices.Services
         public async Task<EmployeeSkillDto> CreateAsync(EmployeeSkillCreateDto skill)
         {
             if (skill is null)
-                throw new ArgumentNullException("employee skill input object cannot be null");
+                throw new ArgumentNullException(GlobalConstants.EMPLOYEE_SKILL_OBJ_NULL);
             
             var dbEmpSkill = mapper.Map<EmployeeSkill>(skill);
             dbEmpSkill.DateCreated = DateTime.Now;
@@ -27,7 +27,7 @@ namespace SkillCentral.SkillServices.Services
         public async Task<List<EmployeeSkillDto>> GetAsync(string userId)
         {
             if (userId is null)
-                throw new ArgumentNullException("userid cannot be null");
+                throw new ArgumentNullException(GlobalConstants.USER_ID_NULL);
 
             var data = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.IsActive))?.ToList();
             if (data is not null && data.Count > 0)
@@ -46,7 +46,7 @@ namespace SkillCentral.SkillServices.Services
         public async Task<EmployeeSkillDto> GetAsync(string userId, int skillId)
         {
             if (userId is null || skillId  == 0)
-                throw new ArgumentNullException("User Id cannot be null or Skill Id cannot be 0");
+                throw new ArgumentNullException($"{GlobalConstants.USER_ID_NULL} or {GlobalConstants.SKILL_ID_ZERO}");
 
             var data = await repository.GetSingleAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.IsActive);
             if (data is not null)
@@ -59,7 +59,7 @@ namespace SkillCentral.SkillServices.Services
         public async Task<bool> RemoveSkillAsync(string userId, int skillId)
         {
             if (userId is null || skillId == 0)
-                throw new ArgumentNullException("User id cannot be null");
+                throw new ArgumentNullException(GlobalConstants.USER_ID_NULL);
 
             var record = await repository.GetSingleAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower() && x.SkillId == skillId);
             record.IsActive = false;
@@ -78,7 +78,7 @@ namespace SkillCentral.SkillServices.Services
         public async Task<bool> RemoveSkillsAsync(string userId)
         {
             if (userId is null)
-                throw new ArgumentNullException("User id cannot be null");
+                throw new ArgumentNullException(GlobalConstants.USER_ID_NULL);
 
             var records = (await repository.GetListAsync<EmployeeSkill>(x => x.UserId.ToLower() == userId.ToLower())).ToList();
             if (records is not null && records.Any())
@@ -105,11 +105,21 @@ namespace SkillCentral.SkillServices.Services
             return dto;
         }
 
-        private async Task SendNotification(string userId, string notification, string routeKey)
+        private async Task SendNotification(string userId, string notification, string routeKey, bool isUser = true)
         {
             NotificationCreateDto notificationDto = new NotificationCreateDto();
             notificationDto.UserId = userId;
             notificationDto.Notification = notification;
+            if (!isUser)
+            {
+                notificationDto.IsAdmin = true;
+                notificationDto.IsSupport = true;
+            }
+            else
+            {
+                notificationDto.IsAdmin = false;
+                notificationDto.IsSupport = false;
+            }
             await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
         }
         #endregion

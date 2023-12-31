@@ -16,6 +16,7 @@ namespace SkillCentral.NotificationServices.Contracts
         {
             await rabbitPubSubService.ConsumeTopicAsync<NotificationCreateDto>(MQConstants.EMPLOYEE_SKILL_LIKE_ROUTE_KEY, async (dto) =>
             {
+                //This needs to be initialze here only as the hosted server is a singleton class
                 INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
                 if (dto is null || string.IsNullOrEmpty(dto.UserId))
                     return;
@@ -28,6 +29,7 @@ namespace SkillCentral.NotificationServices.Contracts
                 if (dto is null)
                     return;
 
+                //This needs to be initialze here only as the hosted server is a singleton class
                 INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
 
                 dto.IsAdmin = true;
@@ -41,6 +43,7 @@ namespace SkillCentral.NotificationServices.Contracts
                 if (dto is null)
                     return;
 
+                //This needs to be initialze here only as the hosted server is a singleton class
                 INotificationService _notificationService = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<INotificationService>();
                 dto.IsCompleted = false;
                 await _notificationService.CreateAsync(dto);

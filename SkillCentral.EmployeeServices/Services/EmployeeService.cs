@@ -44,7 +44,7 @@ namespace SkillCentral.EmployeeServices.Services
             //To User
             await SendNotification(dto.UserId, string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED_USER, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY);
             //To Admin or support
-            await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY);
+            await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY, isUser: false);
 
             return dto;
         }
@@ -68,7 +68,7 @@ namespace SkillCentral.EmployeeServices.Services
                 //To User
                 await SendNotification(dto.UserId, EmployeeServiceConstants.EMPLOYEE_UPDATED_USER, MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY);
                 //To Admin or support
-                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_UPDATED, dto.UserId), MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY);
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_UPDATED, dto.UserId), MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY, isUser: false);
                 return dto;
             }
 
@@ -92,29 +92,30 @@ namespace SkillCentral.EmployeeServices.Services
             if (isSuccess)
             {
                 await pubSubQueueService.PublishTopicAsync(empDto, MQConstants.EMPLOYEE_DELETE_ROUTE_KEY);
-                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_DELETED, empDto.UserId), MQConstants.EMPLOYEE_DELETE_ROUTE_KEY);
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_DELETED, empDto.UserId), MQConstants.EMPLOYEE_DELETE_ROUTE_KEY, isUser: false);
             }
 
             return isSuccess;
         }
 
         #region PrivateMethods
-        private async Task SendUserNotification(string userId, string notification, string routeKey)
-        {
-            NotificationCreateDto notificationDto = new NotificationCreateDto();
-            notificationDto.UserId = userId;
-            notificationDto.IsAdmin = false;
-            notificationDto.IsSupport = false;
-            notificationDto.Notification = notification;
-            await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
-        }
-        private async Task SendNotification(string userId, string notification, string routeKey)
+        private async Task SendNotification(string userId, string notification, string routeKey, bool isUser = true)
         {
             NotificationCreateDto notificationDto = new NotificationCreateDto();
             notificationDto.UserId = userId;
             notificationDto.Notification = notification;
-            notificationDto.IsAdmin = true;
-            notificationDto.IsSupport = true;
+
+            if(!isUser)
+            {
+                notificationDto.IsAdmin = true;
+                notificationDto.IsSupport = true;
+            }
+            else
+            {
+                notificationDto.IsAdmin = false;
+                notificationDto.IsSupport = false;
+            }
+            
             await pubSubQueueService.PublishTopicAsync(notificationDto, routeKey);
         }
         #endregion
