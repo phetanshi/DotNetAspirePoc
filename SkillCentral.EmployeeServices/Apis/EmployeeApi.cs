@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using SkillCentral.Dtos;
 using SkillCentral.EmployeeServices.Services;
 
@@ -43,17 +44,46 @@ public static class EmployeeApi
             {
                 apiResponse.Payload = data;
                 apiResponse.IsSuccess = true;
-                apiResponse.Message = "Employee created successfylly!";
+                apiResponse.Message = GlobalConstants.EMPLOYEE_CREATION_SUCCESSFULL;
             }
             else
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Something went wrong!";
+                apiResponse.Message = GlobalConstants.SOMETHING_WRONG;
             }
             return apiResponse;
         })
         .WithName("CreateEmployee")
         .WithOpenApi();
+
+        app.MapPost("/employeesvc/processemployeebatch", async (IEmployeeService employeeService, IFileService fileService, [FromForm] IFormFile input) =>
+        {
+            List<EmployeeDto> data = new List<EmployeeDto>();
+            try
+            {
+                data = await fileService.ReadEmployeeBatchFile<EmployeeDto>(input);
+                await employeeService.ProcessEmployeeBatchAsync(data);
+            }
+            catch (Exception ex)
+            {
+            }
+            ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
+            if (data is not null && data.Count > 0)
+            {
+                apiResponse.Payload = data;
+                apiResponse.IsSuccess = true;
+                apiResponse.Message = GlobalConstants.EMPLOYEE_CREATION_SUCCESSFULL;
+            }
+            else
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = GlobalConstants.SOMETHING_WRONG;
+            }
+            return apiResponse;
+        })
+        .WithName("ProcessEmployeeBatch")
+        .WithOpenApi()
+        .DisableAntiforgery();
 
 
         app.MapPut("/employeesvc/update", async (IEmployeeService employeeService, [FromBody] EmployeeDto employee) =>

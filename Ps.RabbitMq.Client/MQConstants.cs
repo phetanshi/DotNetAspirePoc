@@ -15,6 +15,7 @@ public static class MQConstants
 
     public const string EMPLOYEE_DELETE_ROUTE_KEY = "employee.delete";
     public const string EMPLOYEE_CREATE_ROUTE_KEY = "employee.create";
+    public const string EMPLOYEE_BATCH_ROUTE_KEY = "employee.batch";
     public const string EMPLOYEE_UPDATED_ROUTE_KEY = "employee.updated";
     public const string EMPLOYEE_LIKE_ROUTE_KEY = "employee.*";
 

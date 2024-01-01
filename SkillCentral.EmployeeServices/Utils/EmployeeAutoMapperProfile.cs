@@ -16,6 +16,8 @@ namespace SkillCentral.EmployeeServices.Utils
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.CreatedUserId, opt => opt.MapFrom(src => "admin"));
+
+            CreateMap<EmployeeCreateDto, EmployeeDto>().ReverseMap();
         }
     }
 }

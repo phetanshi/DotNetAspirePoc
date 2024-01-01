@@ -7,7 +7,12 @@ using SkillCentral.Repository;
 
 namespace SkillCentral.EmployeeServices.Services
 {
-    public class EmployeeService(IRepository repository, IMapper mapper, ILogger<EmployeeService> logger, IHttpContextAccessor context, IMqRequestService requestQueueService, IMqPubSubService pubSubQueueService) : ServiceBase(context), IEmployeeService
+    public class EmployeeService(IRepository repository, 
+                                IMapper mapper, 
+                                ILogger<EmployeeService> logger, 
+                                IHttpContextAccessor context, 
+                                IMqRequestService requestQueueService, 
+                                IMqPubSubService pubSubQueueService) : ServiceBase(context), IEmployeeService
     {
         public async Task<EmployeeDto> GetAsync(string userId)
         {
@@ -29,7 +34,7 @@ namespace SkillCentral.EmployeeServices.Services
             return new List<EmployeeDto>();
         }
 
-        public async Task<EmployeeDto> CreateAsync(EmployeeCreateDto employee)
+        public async Task<EmployeeDto> CreateAsync(EmployeeCreateDto employee, bool isBatch = false)
         {
             if (employee is null)
                 throw new ArgumentNullException(GlobalConstants.EMPLOYEE_OBJ_NULL);
@@ -41,14 +46,59 @@ namespace SkillCentral.EmployeeServices.Services
 
             var dto = mapper.Map<EmployeeDto>(dbEmp);
 
-            //To User
-            await SendNotification(dto.UserId, string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED_USER, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY);
-            //To Admin or support
-            await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY, isUser: false);
-
+            if(!isBatch)
+            {
+                //To User
+                await SendNotification(dto.UserId, string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED_USER, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY);
+                //To Admin or support
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_CREATED, dto.UserId), MQConstants.EMPLOYEE_CREATE_ROUTE_KEY, isUser: false);
+            }
             return dto;
         }
-        public async Task<EmployeeDto> UpdateAsync(EmployeeDto updatedEmployee)
+
+        public async Task ProcessEmployeeBatchAsync(List<EmployeeDto> employees)
+        {
+            if(employees is null)
+                throw new ArgumentNullException(GlobalConstants.EMPLOYEE_LIST_OBJ_NULL);
+
+            int invalidCount = 0;
+            int createdCount = 0;
+            int updatedCount = 0;
+            foreach (var emp in employees)
+            {
+                if (string.IsNullOrWhiteSpace(emp.UserId))
+                    invalidCount++;
+                else
+                {
+                    var dbEmp = await repository.GetSingleAsync<Employee>(x => x.UserId.ToLower() == emp.UserId.ToLower());
+                    if (dbEmp is null)
+                    {
+                        EmployeeCreateDto createDto = mapper.Map<EmployeeCreateDto>(emp);
+                        await CreateAsync(createDto, true);
+                        createdCount++;
+                    }
+                    else
+                    {
+                        await UpdateAsync(emp, true);
+                        updatedCount++;
+                    }
+                }
+            }
+
+            if(invalidCount > 0)
+            {
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_BATCH_INVALID_ROWS, invalidCount), MQConstants.EMPLOYEE_BATCH_ROUTE_KEY, isUser: false);
+            }
+            if (createdCount > 0)
+            {
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_BATCH_CREATED_ROWS, createdCount), MQConstants.EMPLOYEE_BATCH_ROUTE_KEY, isUser: false);
+            }
+            if (updatedCount > 0)
+            {
+                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_BATCH_UPDATED_ROWS, updatedCount), MQConstants.EMPLOYEE_BATCH_ROUTE_KEY, isUser: false);
+            }
+        }
+        public async Task<EmployeeDto> UpdateAsync(EmployeeDto updatedEmployee, bool isBatch = false)
         {
 
             if (updatedEmployee is null)
@@ -65,17 +115,21 @@ namespace SkillCentral.EmployeeServices.Services
             if (count > 0)
             {
                 var dto = await GetAsync(updatedEmployee.UserId);
-                //To User
-                await SendNotification(dto.UserId, EmployeeServiceConstants.EMPLOYEE_UPDATED_USER, MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY);
-                //To Admin or support
-                await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_UPDATED, dto.UserId), MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY, isUser: false);
+
+                if(!isBatch)
+                {
+                    //To User
+                    await SendNotification(dto.UserId, EmployeeServiceConstants.EMPLOYEE_UPDATED_USER, MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY);
+                    //To Admin or support
+                    await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_UPDATED, dto.UserId), MQConstants.EMPLOYEE_UPDATED_ROUTE_KEY, isUser: false);
+                }
                 return dto;
             }
 
             return null;
         }
 
-        public async Task<bool> DeleteAsync(string userId)
+        public async Task<bool> DeleteAsync(string userId, bool isBatch = false)
         {
             if (userId is null)
                 throw new ArgumentNullException(GlobalConstants.USER_ID_NULL);
@@ -89,7 +143,7 @@ namespace SkillCentral.EmployeeServices.Services
 
             var empDto = mapper.Map<EmployeeDto>(dbEmp);
 
-            if (isSuccess)
+            if (isSuccess && !isBatch)
             {
                 await pubSubQueueService.PublishTopicAsync(empDto, MQConstants.EMPLOYEE_DELETE_ROUTE_KEY);
                 await SendNotification("admin", string.Format(EmployeeServiceConstants.EMPLOYEE_DELETED, empDto.UserId), MQConstants.EMPLOYEE_DELETE_ROUTE_KEY, isUser: false);

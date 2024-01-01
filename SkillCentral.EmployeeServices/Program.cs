@@ -16,12 +16,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServerRepository<EmployeeDbContext>(builder.Configuration);
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-//builder.Services.AddSingleton<EmployeeMQContract>();
+builder.Services.AddScoped<IFileService, FileService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddHostedService<EmployeeHostedService>();
 
+builder.Services.AddAntiforgery();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -31,6 +33,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseAntiforgery();
 
 app.MapEmployeeApiEndpoints();
 
