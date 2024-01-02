@@ -2,6 +2,12 @@
 {
     public static class EmployeeServiceConstants
     {
+        public const string EMPLOYEE_DETAILS_FOUND = "Employee data found!";
+        public const string EMPLOYEE_DETAILS_NOT_FOUND = "Employee details were not found";
+        public const string EMPLOYEE_DETAILS_UPDATED = "Employee details updated successfully!";
+        public const string EMPLOYEE_DETAILS_DELETED = "Employee deleted successfully!";
+
+
         public const string EMPLOYEE_CREATED = "A new employee have been created in the system! User Id : {0}";
         public const string EMPLOYEE_CREATED_USER = "Your profile have been created in the system! and your User Id is {0}. All the best.";
 

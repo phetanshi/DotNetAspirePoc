@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using SkillCentral.Dtos;
 using SkillCentral.EmployeeServices.Services;
+using SkillCentral.EmployeeServices.Utils;
 
 namespace SkillCentral.EmployeeServices.Apis;
 
@@ -14,7 +15,7 @@ public static class EmployeeApi
             var data = await employeeService.GetAsync();
             ApiResponse<List<EmployeeDto>> apiResponse = new ApiResponse<List<EmployeeDto>>();
             apiResponse.IsSuccess = true;
-            apiResponse.Message = data is null ? "Something went wrong!" : "Employee list found!";
+            apiResponse.Message = data is null ? GlobalConstants.SOMETHING_WRONG : EmployeeServiceConstants.EMPLOYEE_DETAILS_FOUND;
             apiResponse.Payload = data;
 
             return apiResponse;
@@ -27,7 +28,7 @@ public static class EmployeeApi
             var data = await employeeService.GetAsync(userId);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             apiResponse.IsSuccess = true;
-            apiResponse.Message = data is null ? "Employee details were not found!" : "Employee details found!";
+            apiResponse.Message = data is null ? EmployeeServiceConstants.EMPLOYEE_DETAILS_NOT_FOUND : EmployeeServiceConstants.EMPLOYEE_DETAILS_FOUND;
             apiResponse.Payload = data;
 
             return apiResponse;
@@ -91,7 +92,7 @@ public static class EmployeeApi
             var data = await employeeService.UpdateAsync(employee);
             ApiResponse<EmployeeDto> apiResponse = new ApiResponse<EmployeeDto>();
             apiResponse.IsSuccess = data is not null ? true : false;
-            apiResponse.Message = data is not null ? "Employee details updated successfully!" : "Something went wrong!";
+            apiResponse.Message = data is not null ? EmployeeServiceConstants.EMPLOYEE_DETAILS_UPDATED : GlobalConstants.SOMETHING_WRONG;
             apiResponse.Payload = data;
             return apiResponse;
         })
@@ -104,7 +105,7 @@ public static class EmployeeApi
             var data = await employeeService.DeleteAsync(userId);
             ApiResponse<bool> apiResponse = new ApiResponse<bool>();
             apiResponse.IsSuccess = data;
-            apiResponse.Message = data ? "Employee deleted successfully!" : "Something went wrong!";
+            apiResponse.Message = data ? EmployeeServiceConstants.EMPLOYEE_DETAILS_DELETED : GlobalConstants.SOMETHING_WRONG;
             apiResponse.Payload = data;
             return apiResponse;
         })
