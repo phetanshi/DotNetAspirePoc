@@ -1,0 +1,40 @@
+﻿@page "/skills"
+@inject ISkillHttpClient skillClient
+@inject ILogger<Skills> logger;
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Class="mb-2" Size="Size.Small" OnClick="HandleAddSkill" />
+
+@if(dtos is not null)
+{
+    <MudDataGrid Items="@dtos" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+        <Columns>
+            <PropertyColumn Property="x => x.Id" />
+            <PropertyColumn Property="x => x.Name" />
+            <TemplateColumn CellClass="d-flex justify-start" Title="Mark As Complete">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Error" OnClick="() => OnDeleteButtonClicked(context.Item)"></MudIconButton>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+@code {
+    private List<SkillDto> dtos;
+    protected override async Task OnInitializedAsync()
+    {
+        dtos = await skillClient.GetSkillsAsync();
+    }
+
+    private async Task OnDeleteButtonClicked(SkillDto dto)
+    {
+        await skillClient.DeleteSkillAsync(dto.Id);
+    }
+
+    private void HandleAddSkill()
+    {
+        navigationManager.NavigateTo("/editskill");
+    }
+}

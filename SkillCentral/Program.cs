@@ -1,6 +1,7 @@
 using SkillCentral.ApiClients;
 using SkillCentral.Client.Pages;
 using SkillCentral.Components;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://employeeservices"));
-builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://skillservices"));
+//builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://employeeservices"));
+//builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://skillservices"));
+//builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://notificationservices"));
+
+builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://localhost:5228"));
+builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://localhost:5203"));
+builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://localhost:5013"));
+
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

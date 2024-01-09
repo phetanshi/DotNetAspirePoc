@@ -60,7 +60,7 @@ namespace SkillCentral.SkillServices.Apis
             .WithName("UpdateSkill")
             .WithOpenApi();
 
-            app.MapDelete("/skillsvc/deleteskill", async (ISkillService skillService, [FromBody] int skillId) =>
+            app.MapDelete("/skillsvc/deleteskill", async (ISkillService skillService, [FromQuery] int skillId) =>
             {
                 var data = await skillService.DeleteAsync(skillId);
                 ApiResponse<bool> apiResponse = new ApiResponse<bool>();

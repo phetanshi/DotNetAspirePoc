@@ -1,11 +1,29 @@
-﻿namespace SkillCentral.ApiClients;
+﻿
+using SkillCentral.Dtos;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class EmployeeHttpClient : IEmployeeHttpClient
+namespace SkillCentral.ApiClients;
+
+public class EmployeeHttpClient(HttpClient http, ILogger<EmployeeHttpClient> logger) : ClientBase(http, logger), IEmployeeHttpClient
 {
-    private readonly HttpClient http;
-
-    public EmployeeHttpClient(HttpClient http)
+    public async Task<List<EmployeeDto>> GetEmployee()
     {
-        this.http = http;
+        try
+        {
+            var response = await Http.GetAsync("/employeesvc/employees");
+            var data = await response.Content.ReadFromJsonAsync<ApiResponse<List<EmployeeDto>>>();
+            return data?.Payload ?? new List<EmployeeDto>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occured while fetching employee list data from api");
+        }
+        return new List<EmployeeDto>();
+    }
+
+    public async Task<EmployeeDto> GetEmployee(string userId)
+    {
+        var data = await http.GetFromJsonAsync<ApiResponse<EmployeeDto>>($"/employeesvc/employeebyid?userId={userId}");
+        return data?.Payload ?? default;
     }
 }

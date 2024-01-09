@@ -1,0 +1,36 @@
+﻿@page "/adminnotifications"
+@inject INotificationHttpClient notificationClient
+@inject ILogger<AdminNotifications> logger;
+@rendermode InteractiveServer
+
+@if (notifications is not null)
+{
+    <MudDataGrid Items="@notifications" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+        <Columns>
+            <PropertyColumn Property="x => x.Id" />
+            <PropertyColumn Property="x => x.Notification" />
+            <PropertyColumn Property="x => x.IsCompleted" Title="Is Completed" />
+            <TemplateColumn CellClass="d-flex justify-start" Title="Mark As Complete">
+                <CellTemplate>
+                    <NotificationToggleIconButton NotificationObj="context.Item" OnIconClick="HandleMarkeAsComplete" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+@code {
+    private List<NotificationDto> notifications;
+    protected override async Task OnInitializedAsync()
+    {
+        logger.LogInformation($"-- OnInitializedAsync called --");
+        notifications = await notificationClient.GetAdminNotificationsAsync();
+    }
+
+    private void HandleMarkeAsComplete(bool isOff, NotificationDto dto)
+    {
+        if (isOff)
+            notificationClient.MarkAsComplete(dto.Id);
+        logger.LogInformation($"HandleMarkeAsComplete Called : {dto.Id} - {isOff}");
+    }
+}

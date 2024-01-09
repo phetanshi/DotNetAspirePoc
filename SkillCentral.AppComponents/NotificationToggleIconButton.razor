@@ -1,0 +1,23 @@
+﻿@typeparam T
+
+<MudToggleIconButton Toggled="isOn" ToggledChanged="(toggled) => HandleMarkeAsComplete(toggled)"
+                     Icon="@Icons.Material.Filled.Notifications" Color="@Color.Primary" Title="On"
+                     ToggledIcon="@Icons.Material.Filled.NotificationsOff" ToggledColor="@Color.Error" ToggledTitle="Off" />
+
+@code {
+
+    [Parameter]
+    public T NotificationObj { get; set; }
+
+    [Parameter]
+    public Action<bool, T> OnIconClick { get; set; }
+
+    private bool isOn = false;
+
+
+    private void HandleMarkeAsComplete(bool toggled)
+    {
+        isOn = toggled;
+        OnIconClick.Invoke(toggled, NotificationObj);
+    }
+}

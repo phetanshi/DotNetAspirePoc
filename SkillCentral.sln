@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.NotificationSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillCentral.Repository", "SkillCentral.Repository\SkillCentral.Repository.csproj", "{20CEA266-EE88-4653-B7B6-C1673672879B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ps.RabbitMq.Client", "Ps.RabbitMq.Client\Ps.RabbitMq.Client.csproj", "{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ps.RabbitMq.Client", "Ps.RabbitMq.Client\Ps.RabbitMq.Client.csproj", "{4C16831C-9548-4589-A0D3-C3D5A8CC03F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,44 @@
+﻿@page "/employees"
+@inject IEmployeeHttpClient employeeClient
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Employee List</PageTitle>
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Class="mb-2" Size="Size.Small" OnClick="HandleAddEmployee" />
+@if(employees is not null)
+{
+    <MudDataGrid Items="@employees" Filterable="false" SortMode="@SortMode.None" Groupable="false">
+        <Columns>
+            <TemplateColumn CellClass="d-flex justify-start" Title="User Id">
+                <CellTemplate>
+                    <MudLink Href=@(string.Format(AppConstants.PAGE_EMPLOYEE_SKILL, context.Item.UserId))>@context.Item.UserId</MudLink>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+            <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+            <PropertyColumn Property="x => x.Designation" />
+            <PropertyColumn Property="x => GetTotalExp(x.TotalExpInYears, x.TotalExpInMonths)" Title="Total Experience" />
+        </Columns>
+    </MudDataGrid>
+}
+@code {
+    private List<EmployeeDto> employees;
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await employeeClient.GetEmployee();
+    }
+
+    private void HandleAddEmployee()
+    {
+        navigationManager.NavigateTo("/editemployee");
+    }
+
+    private decimal GetTotalExp(int? years, int? months)
+    {
+        int tempYears = years.HasValue ? years.Value : 0;
+        int tempMonths = months.HasValue ? months.Value : 0;
+        string str = $"{tempYears.ToString()}.{tempMonths.ToString()}";
+        return Convert.ToDecimal(str);
+    }
+}

@@ -1,6 +1,10 @@
-﻿namespace SkillCentral.ApiClients
+﻿using SkillCentral.Dtos;
+
+namespace SkillCentral.ApiClients;
+
+public interface ISkillHttpClient
 {
-    public interface ISkillHttpClient
-    {
-    }
+    Task<List<SkillDto>> GetSkillsAsync();
+    Task<SkillDto> CreateSkillAsync(SkillCreateDto skillDto);
+    Task DeleteSkillAsync(int skillId);
 }
