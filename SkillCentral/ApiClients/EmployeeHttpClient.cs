@@ -6,13 +6,25 @@ namespace SkillCentral.ApiClients;
 
 public class EmployeeHttpClient(HttpClient http, ILogger<EmployeeHttpClient> logger) : ClientBase(http, logger), IEmployeeHttpClient
 {
-    public async Task<List<EmployeeDto>> GetEmployee()
+    public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeCreateDto emp)
     {
         try
         {
-            var response = await Http.GetAsync("/employeesvc/employees");
-            var data = await response.Content.ReadFromJsonAsync<ApiResponse<List<EmployeeDto>>>();
-            return data?.Payload ?? new List<EmployeeDto>();
+            var response = await Http.PostAsJsonAsync<EmployeeCreateDto>("/employeesvc/create", emp);
+            return await ReadPostResponseAsync<EmployeeDto>(response);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while creating employee");
+        }
+        return null;
+    }
+
+    public async Task<List<EmployeeDto>> GetEmployeeAsync()
+    {
+        try
+        {
+            return await GetListAsync<EmployeeDto>("/employeesvc/employees");
         }
         catch (Exception ex)
         {
@@ -21,9 +33,8 @@ public class EmployeeHttpClient(HttpClient http, ILogger<EmployeeHttpClient> log
         return new List<EmployeeDto>();
     }
 
-    public async Task<EmployeeDto> GetEmployee(string userId)
+    public async Task<EmployeeDto> GetEmployeeAsync(string userId)
     {
-        var data = await http.GetFromJsonAsync<ApiResponse<EmployeeDto>>($"/employeesvc/employeebyid?userId={userId}");
-        return data?.Payload ?? default;
+        return await GetAsync<EmployeeDto>($"/employeesvc/employeebyid?userId={userId}");
     }
 }

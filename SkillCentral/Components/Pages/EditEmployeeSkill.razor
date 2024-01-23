@@ -1,15 +1,48 @@
 ﻿@page "/employeeskill/{userid}"
-<PageTitle>@userName - Skills</PageTitle>
 
-<MudText Typo="Typo.h6">@UserId</MudText>
+@inject IEmployeeSkillHttpClient employeeSkillClient
+@inject ISkillHttpClient skillClient
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+@attribute [StreamRendering]
 
-@code {
-    [Parameter]
-    public string? UserId { get; set; }
-    private string userName = "";
-    protected override Task OnInitializedAsync()
-    {
-        userName = "First";
-        return base.OnInitializedAsync();
-    }
-}
+<PageTitle>@empName - Skills</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="12">
+        <EditForm Model="@EmployeeSkill" OnValidSubmit="@OnValidFormSubmit" FormName="AddEmployeeSkillForm">
+            <DataAnnotationsValidator />
+            <MudPaper Class="pa-4" sm="12">
+                @if (empSkillDto is not null && empSkillDto.Id > 0)
+                {
+                    <MudAlert Severity="Severity.Success">The skill have been added</MudAlert>
+                }
+                
+                <div class="d-flex">
+                    @if (skillList is not null && skillList.Count > 0)
+                    {
+                        <MudSelect T="SkillDto" @bind-Value="selectedSkill" Label="Select Skill" Variant="Variant.Outlined" Clearable>
+                            @foreach (var skill in skillList)
+                            {
+                                <MudSelectItem Value="@skill">@skill.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    <MudNumericField Label="Experience  (In Years)" @bind-Value="EmployeeSkill.YearsOfExpInTheSkill" For="@(() => EmployeeSkill.YearsOfExpInTheSkill)" Variant="Variant.Text" Min="0" Max="60" />
+                    <MudNumericField Label="Experience  (In Months)" @bind-Value="EmployeeSkill.MonthsOfExpInTheSkill" For="@(() => EmployeeSkill.MonthsOfExpInTheSkill)" Variant="Variant.Text" Min="0" Max="12" />
+                    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+                </div>
+
+                
+            </MudPaper>
+                @if (!isFormValid)
+                {
+                <MudPaper Class="pa-4 mud-height-full" sm="12">
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                </MudPaper>
+                }
+        </EditForm>
+    </MudItem>
+</MudGrid>

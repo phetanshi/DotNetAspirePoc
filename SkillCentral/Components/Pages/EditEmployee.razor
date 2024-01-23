@@ -1,7 +1,40 @@
 ﻿@page "/editemployee"
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+@inject IEmployeeHttpClient employeeApiClient
+@inject ISnackbar Snackbar
 
-<h3>EditEmployee</h3>
+<MudGrid>
+    <MudItem xs="12" sm="12">
+        <EditForm Model="@Employee" OnValidSubmit="@OnValidFormSubmit" FormName="CreateEmployeeForm">
+            <DataAnnotationsValidator />
+            <MudPaper Class="pa-4" sm="12">
+                @if (empDto is not null && !string.IsNullOrEmpty(empDto.UserId))
+                {
+                    <MudAlert Severity="Severity.Success">User Id : @empDto.UserId</MudAlert>
+                }
+                
+                <MudTextField Label="First name" @bind-Value="Employee.FirstName" HelperText="Max. 25 characters" For="@(() => Employee.FirstName)" />
+                <MudTextField Label="Last name" @bind-Value="Employee.LastName" HelperText="Max. 25 characters" For="@(() => Employee.LastName)" />
+                <MudTextField Label="Designation" @bind-Value="Employee.Designation" HelperText="Max. 25 characters" For="@(() => Employee.Designation)" />
 
-@code {
+                <div class="d-flex">
+                    <MudNumericField Label="Experience  (In Years)" @bind-Value="Employee.TotalExpInYears" For="@(() => Employee.TotalExpInYears)" Variant="Variant.Text" Min="0" Max="60" />
+                    <MudNumericField Label="Experience  (In Months)" @bind-Value="Employee.TotalExpInMonths" For="@(() => Employee.TotalExpInMonths)" Variant="Variant.Text" Min="0" Max="12" />
+                </div>
 
-}
+                <div class="mt-1">
+                    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" Class="ml-auto">Create</MudButton>
+                </div>
+            </MudPaper>
+            <MudPaper Class="pa-4 mud-height-full" sm="12">
+                @if (!isFormValid)
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </EditForm>
+    </MudItem>
+</MudGrid>

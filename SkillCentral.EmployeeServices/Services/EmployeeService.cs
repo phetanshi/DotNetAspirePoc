@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Ps.RabbitMq.Client;
 using SkillCentral.Dtos;
 using SkillCentral.EmployeeServices.Data.DbModels;
@@ -43,6 +44,10 @@ namespace SkillCentral.EmployeeServices.Services
             dbEmp.DateCreated = DateTime.Now;
             dbEmp.CreatedUserId = GetLoginUserId();
             dbEmp = await repository.CreateAsync(dbEmp);
+
+            //updating user id for new employee
+            dbEmp.UserId = $"EMP{dbEmp.Id}";
+            await repository.UpdateAsync(dbEmp);
 
             var dto = mapper.Map<EmployeeDto>(dbEmp);
 

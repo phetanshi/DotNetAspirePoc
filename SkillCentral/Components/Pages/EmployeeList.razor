@@ -2,6 +2,7 @@
 @inject IEmployeeHttpClient employeeClient
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
+@attribute [StreamRendering]
 
 <PageTitle>Employee List</PageTitle>
 
@@ -26,7 +27,7 @@
     private List<EmployeeDto> employees;
     protected override async Task OnInitializedAsync()
     {
-        employees = await employeeClient.GetEmployee();
+        employees = await employeeClient.GetEmployeeAsync();
     }
 
     private void HandleAddEmployee()

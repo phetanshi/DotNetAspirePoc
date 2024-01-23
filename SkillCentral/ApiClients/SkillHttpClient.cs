@@ -9,17 +9,20 @@ public class SkillHttpClient(HttpClient http, ILogger<SkillHttpClient> logger) :
 {
     public async Task<List<SkillDto>> GetSkillsAsync()
     {
+        List<SkillDto> data = new List<SkillDto>();
         try
 		{
-            var response = await Http.GetAsync("/skillsvc/skills");
-            return await ReadSkillListData(response);
-
+            data = await GetListAsync<SkillDto>("/skillsvc/skills");
+            if(data is null)
+            {
+                data = new List<SkillDto>();
+            }
         }
 		catch (Exception ex)
 		{
             logger.LogError(ex, "Error while fetching skill list");
         }
-		return new List<SkillDto>();
+        return data;
     }
 
     public async Task<SkillDto> CreateSkillAsync(SkillCreateDto skillDto)
@@ -29,19 +32,7 @@ public class SkillHttpClient(HttpClient http, ILogger<SkillHttpClient> logger) :
         try
         {
             var response = await Http.PostAsJsonAsync("/skillsvc/createskill", skillDto);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<SkillDto>>();
-                if (!result.IsSuccess)
-                    throw new Exception("Something went wrong while creating a new skill");
-                return result.Payload;
-            }
-            else
-            {
-                var result = (await response?.Content?.ReadFromJsonAsync<ApiResponse<SkillDto>>())?.Message ?? "Something went wrong while creating a new skill. API call returned error code.";
-                throw new Exception(result);
-            }
+            return await ReadPostResponseAsync<SkillDto>(response);
         }
         catch (Exception ex)
         {
@@ -62,12 +53,4 @@ public class SkillHttpClient(HttpClient http, ILogger<SkillHttpClient> logger) :
             logger.LogError(ex, "Error occurred while deleting a skill");
         }
     }
-
-    private async Task<List<SkillDto>> ReadSkillListData(HttpResponseMessage? response)
-    {
-        var data = await response.Content.ReadFromJsonAsync<ApiResponse<List<SkillDto>>>();
-        return data?.Payload ?? new List<SkillDto>();
-    }
-
-    
 }

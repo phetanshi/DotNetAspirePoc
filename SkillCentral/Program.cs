@@ -12,13 +12,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-//builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://employeeservices"));
-//builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://skillservices"));
-//builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://notificationservices"));
+builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://employeeservices"));
+builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://skillservices"));
+builder.Services.AddHttpClient<IEmployeeSkillHttpClient, EmployeeSkillHttpClient>(client => client.BaseAddress = new("http://skillservices"));
+builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://notificationservices"));
 
-builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://localhost:5228"));
-builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://localhost:5203"));
-builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://localhost:5013"));
+//builder.Services.AddHttpClient<IEmployeeHttpClient, EmployeeHttpClient>(client => client.BaseAddress = new("http://localhost:5228"));
+//builder.Services.AddHttpClient<ISkillHttpClient, SkillHttpClient>(client => client.BaseAddress = new("http://localhost:5203"));
+//builder.Services.AddHttpClient<INotificationHttpClient, NotificationHttpClient>(client => client.BaseAddress = new("http://localhost:5013"));
 
 builder.Services.AddMudServices();
 

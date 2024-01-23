@@ -4,6 +4,7 @@ namespace SkillCentral.ApiClients;
 
 public interface IEmployeeHttpClient
 {
-    Task<List<EmployeeDto>> GetEmployee();
-    Task<EmployeeDto> GetEmployee(string userId);
+    Task<List<EmployeeDto>> GetEmployeeAsync();
+    Task<EmployeeDto> GetEmployeeAsync(string userId);
+    Task<EmployeeDto> CreateEmployeeAsync(EmployeeCreateDto emp);
 }

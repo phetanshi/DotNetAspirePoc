@@ -1,8 +1,33 @@
 ﻿@page "/editskill"
+@using System.ComponentModel.DataAnnotations
 @inject ISkillHttpClient skillClient
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
 
-<h3>EditSkill</h3>
+<MudGrid>
+    <MudItem xs="12" sm="12">
+        <EditForm Model="@NewSkill" OnValidSubmit="@OnValidFormSubmit" FormName="CreateEmployeeForm">
+            <DataAnnotationsValidator />
+            <MudPaper Class="pa-4" sm="12">
+                @if (skillDto is not null && skillDto.Id > 0)
+                {
+                    <MudAlert Severity="Severity.Success">New Skill Id : @skillDto.Id</MudAlert>
+                }
 
-@code {
+                <MudTextField Label="Skill name" @bind-Value="NewSkill.Name" HelperText="Max. 250 characters" For="@(() => NewSkill.Name)" />
 
-}
+                <div class="mt-1">
+                    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" Class="ml-auto">Create</MudButton>
+                </div>
+            </MudPaper>
+            <MudPaper Class="pa-4 mud-height-full" sm="12">
+                @if (!isFormValid)
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </EditForm>
+    </MudItem>
+</MudGrid>
